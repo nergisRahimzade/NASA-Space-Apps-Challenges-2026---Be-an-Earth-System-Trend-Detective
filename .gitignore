@@ -1,0 +1,25 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Local credentials
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.netrc
+_netrc
+
+# Downloaded and processed datasets
+data/raw/
+data/processed/
+
+# Notebook temporary files
+.ipynb_checkpoints/
