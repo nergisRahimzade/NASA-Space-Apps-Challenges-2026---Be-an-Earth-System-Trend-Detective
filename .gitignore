@@ -23,3 +23,9 @@ data/processed/
 
 # Notebook temporary files
 .ipynb_checkpoints/
+
+# Tool Caches
+.pytest_cache
+.ruff_cache
+# Local datasets
+/data/
