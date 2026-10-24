@@ -1,0 +1,21 @@
+{
+  "status": "passed_actual_npz_xarray_netcdf_roundtrip",
+  "xarray_version": "2026.9.0",
+  "dimensions": {
+    "lat": 12,
+    "lon": 16
+  },
+  "source_filename": "MOD11C3.A2024122.061.2024162162404.hdf",
+  "source_sha256": "9c24b83a13b62f914dbf9ae4842fd4d70b8d2eef0f41ab34441f914ad00f09ea",
+  "checks": {
+    "latitude_longitude_parity": true,
+    "decoded_temperature_parity": true,
+    "qc_preserved": true,
+    "bitmap_preserved": true,
+    "land_fraction_preserved": true,
+    "strict_mask_preserved": true,
+    "source_sha256_matches": true
+  },
+  "production_qa_accepted": false,
+  "scope": "One May 2024 Phoenix diagnostic crop; not an accepted time series."
+}
