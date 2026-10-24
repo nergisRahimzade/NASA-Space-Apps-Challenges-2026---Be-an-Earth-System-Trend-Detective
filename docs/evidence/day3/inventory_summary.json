@@ -1,0 +1,131 @@
+{
+  "study": {
+    "bbox_west_south_east_north": [
+      -112.4,
+      33.2,
+      -111.6,
+      33.8
+    ],
+    "start_month": "2003-01",
+    "end_month": "2024-12"
+  },
+  "products": [
+    {
+      "product": "MOD11C3",
+      "version": "061",
+      "collection_concept_id": "C2565788897-LPCLOUD",
+      "retrieved_utc": "2026-10-24T20:18:47.211126+00:00",
+      "request_url": "https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id=C2565788897-LPCLOUD&temporal=2003-01-01T00%3A00%3A00Z%2C2024-12-31T23%3A59%3A59Z&bounding_box=-112.4%2C33.2%2C-111.6%2C33.8&page_size=500&sort_key=start_date",
+      "cmr_hits": 264,
+      "returned_records": 264,
+      "expected_months": 264,
+      "unique_months": 264,
+      "missing_months": [],
+      "unexpected_months": [],
+      "duplicate_months": {},
+      "wrong_version_records": [],
+      "wrong_monthly_intervals": [],
+      "all_264_months_once": true,
+      "first_start": "2003-01-01T00:00:00.000Z",
+      "last_end": "2024-12-31T23:59:59.000Z",
+      "catalogue_size_unit": "CMR granule_size MB, not measured transfer bytes",
+      "records_with_size": 264,
+      "reported_MB_min": 65.0571,
+      "reported_MB_max": 73.8744,
+      "reported_MB_total": 18535.427065356445,
+      "example": {
+        "id": "G2595626887-LPCLOUD",
+        "producer_granule_id": "MOD11C3.A2014001.061.2021321165755",
+        "time_start": "2014-01-01T00:00:00.000Z",
+        "time_end": "2014-01-31T23:59:59.000Z",
+        "granule_size": "68.2213",
+        "boxes": [
+          "-90 -180 90 180"
+        ]
+      },
+      "limitations": [
+        "Catalogue records do not demonstrate usable Phoenix pixels or complete clear-sky sampling.",
+        "A bounding-box search selects overlapping global granules; it does not crop them.",
+        "No science-data files are downloaded by this script."
+      ]
+    },
+    {
+      "product": "MYD11C3",
+      "version": "061",
+      "collection_concept_id": "C2565794044-LPCLOUD",
+      "retrieved_utc": "2026-10-24T20:18:47.262056+00:00",
+      "request_url": "https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id=C2565794044-LPCLOUD&temporal=2003-01-01T00%3A00%3A00Z%2C2024-12-31T23%3A59%3A59Z&bounding_box=-112.4%2C33.2%2C-111.6%2C33.8&page_size=500&sort_key=start_date",
+      "cmr_hits": 264,
+      "returned_records": 264,
+      "expected_months": 264,
+      "unique_months": 264,
+      "missing_months": [],
+      "unexpected_months": [],
+      "duplicate_months": {},
+      "wrong_version_records": [],
+      "wrong_monthly_intervals": [],
+      "all_264_months_once": true,
+      "first_start": "2003-01-01T00:00:00.000Z",
+      "last_end": "2024-12-31T23:59:59.000Z",
+      "catalogue_size_unit": "CMR granule_size MB, not measured transfer bytes",
+      "records_with_size": 264,
+      "reported_MB_min": 64.544,
+      "reported_MB_max": 75.132,
+      "reported_MB_total": 18851.6301523407,
+      "example": {
+        "id": "G2618669682-LPCLOUD",
+        "producer_granule_id": "MYD11C3.A2014001.061.2021319172317",
+        "time_start": "2014-01-01T00:00:00.000Z",
+        "time_end": "2014-01-31T23:59:59.000Z",
+        "granule_size": "69.0028",
+        "boxes": [
+          "-90 -180 90 180"
+        ]
+      },
+      "limitations": [
+        "Catalogue records do not demonstrate usable Phoenix pixels or complete clear-sky sampling.",
+        "A bounding-box search selects overlapping global granules; it does not crop them.",
+        "No science-data files are downloaded by this script."
+      ]
+    },
+    {
+      "product": "MOD21C3",
+      "version": "061",
+      "collection_concept_id": "C2565791050-LPCLOUD",
+      "retrieved_utc": "2026-10-24T20:18:47.269741+00:00",
+      "request_url": "https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id=C2565791050-LPCLOUD&temporal=2003-01-01T00%3A00%3A00Z%2C2024-12-31T23%3A59%3A59Z&bounding_box=-112.4%2C33.2%2C-111.6%2C33.8&page_size=500&sort_key=start_date",
+      "cmr_hits": 264,
+      "returned_records": 264,
+      "expected_months": 264,
+      "unique_months": 264,
+      "missing_months": [],
+      "unexpected_months": [],
+      "duplicate_months": {},
+      "wrong_version_records": [],
+      "wrong_monthly_intervals": [],
+      "all_264_months_once": true,
+      "first_start": "2003-01-01T00:00:00.000Z",
+      "last_end": "2024-12-31T23:59:59.000Z",
+      "catalogue_size_unit": "CMR granule_size MB, not measured transfer bytes",
+      "records_with_size": 264,
+      "reported_MB_min": 114.868,
+      "reported_MB_max": 142.899,
+      "reported_MB_total": 34307.14968422699,
+      "example": {
+        "id": "G2618013290-LPCLOUD",
+        "producer_granule_id": "MOD21C3.A2014001.061.2021247212359",
+        "time_start": "2014-01-01T00:00:00.000Z",
+        "time_end": "2014-01-31T23:59:59.000Z",
+        "granule_size": "119.653",
+        "boxes": [
+          "-90 -180 90 180"
+        ]
+      },
+      "limitations": [
+        "Catalogue records do not demonstrate usable Phoenix pixels or complete clear-sky sampling.",
+        "A bounding-box search selects overlapping global granules; it does not crop them.",
+        "No science-data files are downloaded by this script."
+      ]
+    }
+  ]
+}
