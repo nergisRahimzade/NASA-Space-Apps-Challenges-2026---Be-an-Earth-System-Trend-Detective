@@ -6,10 +6,16 @@ from earth_system_trend.api import app
 
 client = TestClient(app)
 
+# Matches docs/contract.md
 SAMPLE = {
     "region": "Test Region",
-    "period": "2000-2020",
-    "series": [{"date": "2000-01", "value": 1.0}],
+    "variable": "Sea surface temperature",
+    "units": "°C",
+    "period": {"start": "2000-01", "end": "2020-12"},
+    "series": [
+        {"date": "2000-01", "value": 1.0},
+        {"date": "2000-02", "value": None},
+    ],
     "trend": {"slope": 0.01, "p": 0.03, "tau": 0.4, "trend": "increasing"},
     "explanation": "Sample text.",
 }

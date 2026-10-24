@@ -69,6 +69,21 @@ uv run --locked streamlit run app/streamlit_app.py
 
 Open the local URL printed in the terminal, usually `http://localhost:8501`. You should see **Earth System Trend Detective** and a message about connecting saved results. Stop the app with **Ctrl+C**.
 
+### 6. Start the API
+
+The API serves analysis results to the dashboard. It currently returns the mock file `results.mock.json` from the project root.
+
+```text
+uv run --locked uvicorn earth_system_trend.api:app --reload
+```
+
+Run this from the project root so the API can find `results.mock.json`. Then open:
+
+- `http://localhost:8000/health` should return `{"status": "ok"}`. This checks that the server is running.
+- `http://localhost:8000/results` returns the contents of `results.mock.json` (see `docs/contract.md`).
+
+Stop the API with **Ctrl+C**. To serve a different results file, set the `RESULTS_PATH` environment variable before starting it.
+
 ## NASA Earthdata access
 
 This step is needed when working on data downloads, but is not required to launch the starter dashboard.
