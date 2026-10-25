@@ -796,6 +796,7 @@ dependencies = [
     { name = "pandas" },
     { name = "plotly" },
     { name = "pymannkendall" },
+    { name = "requests" },
     { name = "streamlit" },
     { name = "xarray" },
 ]
@@ -820,6 +821,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=3.0.6" },
     { name = "plotly", specifier = ">=7.1.0" },
     { name = "pymannkendall", specifier = ">=1.4.3" },
+    { name = "requests", specifier = ">=2.34.2" },
     { name = "streamlit", specifier = ">=1.66.1" },
     { name = "xarray", specifier = ">=2026.9.0" },
 ]
