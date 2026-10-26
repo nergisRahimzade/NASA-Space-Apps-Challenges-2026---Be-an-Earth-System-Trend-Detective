@@ -1,5 +1,7 @@
 ﻿import plotly.graph_objects as go
 import streamlit as st
+from maps import make_map
+from mock_map import mock_points
 
 from api_client import load_results
 
@@ -80,7 +82,11 @@ with know_col.container(border=True):
 
 with st.container(border=True):
     st.subheader("Trend map")
-    st.caption("Placeholder. The map arrives with its own ticket.")
+    st.plotly_chart(make_map(mock_points(), v["units"]))
+    st.caption(
+        "Placeholder locations: the contract has no per-location trends yet, "
+        "so these points are made up for layout only."
+    )
 
 with st.container(border=True):
     st.subheader("AI explanation")
