@@ -1,5 +1,5 @@
-﻿import plotly.graph_objects as go
-import streamlit as st
+﻿import streamlit as st
+from charts import make_chart
 
 from api_client import load_results
 
@@ -29,6 +29,7 @@ def to_view(r):
         "dates": [pt["date"] for pt in points],
         "values": [pt["value"] for pt in points],
         "slope": trend["slope"],
+        "intercept": trend.get("intercept"),
         "p": trend["p"],
         "tau": trend["tau"],
         "trend": trend["trend"],
@@ -67,9 +68,7 @@ with p_col.container(border=True):
 chart_col, know_col = st.columns([2, 1])
 
 with chart_col.container(border=True):
-    fig = go.Figure(go.Scatter(x=v["dates"], y=v["values"], mode="lines"))
-    fig.update_layout(margin={"l": 0, "r": 0, "t": 10, "b": 0}, height=320)
-    st.plotly_chart(fig)
+    st.plotly_chart(make_chart(v))
 
 with know_col.container(border=True):
     st.subheader("How we know")
