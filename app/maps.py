@@ -1,15 +1,19 @@
 import plotly.graph_objects as go
-
-# Placeholder colors from docs/design_notes.md. The real theme comes on Day 6.
-COOLING_COLOR = "#3B82C4"
-NEUTRAL_COLOR = "#F2F2F2"
-WARMING_COLOR = "#E4572E"
+from theme import (
+    BACKGROUND,
+    COOLING,
+    MAP_LAND,
+    MAP_LINES,
+    NEUTRAL,
+    WARMING,
+    style_figure,
+)
 
 
 def make_map(points, units):
     """Scatter map of per-location trends. Each point is {name, lat, lon, slope}."""
     # A symmetric range puts zero exactly at the neutral middle of the scale.
-    limit = max(abs(p["slope"]) for p in points)
+    limit = max(abs(p["slope"]) for p in points) or 1
 
     fig = go.Figure(
         go.Scattergeo(
@@ -22,21 +26,22 @@ def make_map(points, units):
                 "size": 16,
                 "color": [p["slope"] for p in points],
                 "colorscale": [
-                    [0, COOLING_COLOR],
-                    [0.5, NEUTRAL_COLOR],
-                    [1, WARMING_COLOR],
+                    [0, COOLING],
+                    [0.5, NEUTRAL],
+                    [1, WARMING],
                 ],
                 "cmin": -limit,
                 "cmax": limit,
-                "line": {"width": 1, "color": "#444444"},
+                "line": {"width": 1, "color": BACKGROUND},
                 "colorbar": {
-                    "title": {"text": f"Trend ({units} per month)"},
+                    "title": {"text": f"Trend ({units} per month)", "side": "right"},
                     "tickvals": [-limit, 0, limit],
                     "ticktext": [
                         f"Cooling (-{limit:.2f})",
                         "0",
                         f"Warming (+{limit:.2f})",
                     ],
+                    "outlinewidth": 0,
                 },
             },
             hovertemplate=(
@@ -48,14 +53,15 @@ def make_map(points, units):
     fig.update_geos(
         fitbounds="locations",
         showland=True,
-        landcolor="#B8BEC8",
+        landcolor=MAP_LAND,
         showcoastlines=True,
-        coastlinecolor="#6B7280",
+        coastlinecolor=MAP_LINES,
         showcountries=True,
-        countrycolor="#6B7280",
+        countrycolor=MAP_LINES,
         showsubunits=True,
-        subunitcolor="#8A94A6",
+        subunitcolor=MAP_LINES,
+        showlakes=False,
         bgcolor="rgba(0,0,0,0)",
     )
-    fig.update_layout(height=420, margin={"l": 0, "r": 0, "t": 10, "b": 0})
+    style_figure(fig, 420)
     return fig
