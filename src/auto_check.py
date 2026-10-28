@@ -1,6 +1,5 @@
 import re
-import json
-import pytest
+
 
 def verify_ai_text_numbers(json_input: dict, ai_response_text: str) -> bool:
     """
@@ -13,14 +12,10 @@ def verify_ai_text_numbers(json_input: dict, ai_response_text: str) -> bool:
     allowed_source_values.add(str(json_input.get("period")))
     
     trend_block = json_input.get("trend", {})
-    for key, value in trend_block.items():
+    for value in trend_block.values():
         if isinstance(value, (int, float)):
             allowed_source_values.add(f"{value}")
-            allowed_source_values.add(f"{value:.5f}")
-            allowed_source_values.add(f"{value:.4f}")
-            allowed_source_values.add(f"{value:.3f}")
-            allowed_source_values.add(f"{abs(value)}")
-            
+       
     found_numbers = re.findall(r'-?\d+\.?\d*', ai_response_text)
     
     for num in found_numbers:

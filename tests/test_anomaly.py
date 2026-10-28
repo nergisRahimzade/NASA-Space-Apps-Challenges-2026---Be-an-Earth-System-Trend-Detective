@@ -1,7 +1,9 @@
-import pytest
-import pandas as pd
 import numpy as np
-from src.anomaly import calculate_climatology, calculate_anomaly
+import pandas as pd
+import pytest
+
+from src.anomaly import calculate_anomaly, calculate_climatology
+
 
 @pytest.fixture
 def fake_climate_data():
