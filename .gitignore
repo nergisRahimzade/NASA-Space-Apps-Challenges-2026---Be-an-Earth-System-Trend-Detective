@@ -23,9 +23,13 @@ data/processed/
 
 # Notebook temporary files
 .ipynb_checkpoints/
+<<<<<<< Updated upstream
 
 # Tool Caches
 .pytest_cache
 .ruff_cache
 # Local datasets
 /data/
+=======
+.aider*
+>>>>>>> Stashed changes
