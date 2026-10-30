@@ -131,6 +131,23 @@ date window, file count or destination.
 
 Three-file live check: [download record](docs/evidence/day4/download_check.json).
 
+## Download the full study period (Day 5)
+
+```text
+uv run --locked python src/download.py --start 2003-01-01 --end 2024-12-31 --count 264 --output data/raw/MOD11C3 --report data/day5_download_check.json --manifest data/manifest.csv --interactive
+```
+
+This downloads the 264 monthly MOD11C3.061 files for 2003–2024, about 19 GB.
+Validated existing files in the destination are reused. If a run is interrupted,
+run the same command again to download the remaining files.
+
+After all files pass verification, `data/manifest.csv` lists each month,
+filename, relative path, byte size and SHA-256 checksum. The manifest is written
+only when all expected months and files are present, with no duplicates or extra
+HDF4 files. The full check record is `data/day5_download_check.json`.
+
+The small manifest is tracked in Git; raw files and local check records remain ignored.
+
 ## After pulling team changes
 
 From the repository root, run:
