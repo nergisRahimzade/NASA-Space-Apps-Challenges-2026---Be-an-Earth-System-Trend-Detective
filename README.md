@@ -107,6 +107,28 @@ Enter your own username and password when prompted. A successful authentication 
 
 Keep credentials out of source code and Git. The existing `.gitignore` excludes `.env` files, `.netrc`, `_netrc`, and `.streamlit/secrets.toml`. Installing the OpenAI package does not configure AI access. The starter makes no AI calls and does not load `.env` files; configuration instructions should be added alongside that feature.
 
+## Download a three-file sample (Day 4)
+
+From the project root:
+
+```text
+uv run --locked python src/download.py --interactive
+```
+
+Log in once with Earthdata; the script then downloads three MOD11C3.061 monthly
+files for January–March 2003 automatically. The Phoenix search window is fixed
+at `(-112.4, 33.2, -111.6, 33.8)`. The original files are global, about 210 MB in
+total. Nighttime measurements are selected during later processing.
+
+Files go to `data/raw/day4_sample/`. The script checks the filenames, month count,
+catalogue file sizes and HDF4 signatures, then writes sizes and checksums to
+`data/day4_download_check.json`. Valid existing files are reused and reported
+separately from new downloads.
+
+If Earthdata credentials are already configured, omit `--interactive` to run
+without prompts. Use `--start`, `--end`, `--count` and `--output` to change the
+date window, file count or destination.
+
 ## After pulling team changes
 
 From the repository root, run:
