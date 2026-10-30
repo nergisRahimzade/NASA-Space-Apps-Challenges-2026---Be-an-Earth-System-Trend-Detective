@@ -129,6 +129,8 @@ If Earthdata credentials are already configured, omit `--interactive` to run
 without prompts. Use `--start`, `--end`, `--count` and `--output` to change the
 date window, file count or destination.
 
+Three-file live check: [download record](docs/evidence/day4/download_check.json).
+
 ## After pulling team changes
 
 From the repository root, run:
