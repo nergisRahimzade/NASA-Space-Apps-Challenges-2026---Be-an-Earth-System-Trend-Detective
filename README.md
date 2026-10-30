@@ -148,6 +148,20 @@ HDF4 files. The full check record is `data/day5_download_check.json`.
 
 The small manifest is tracked in Git; raw files and local check records remain ignored.
 
+## Inspect one file (Day 6)
+
+```sh
+uv run --locked python src/inspect_data.py data/raw/MOD11C3/MOD11C3.A2024122.061.2024162162404.hdf
+```
+
+This opens the original HDF4 file with xarray and prints its dimensions, all 17
+variables and their attributes. It saves the inventory and one Phoenix nighttime
+temperature map under `docs/evidence/day6/`. See the
+[variable glossary](docs/data_glossary.md) for units, fill values and bit fields.
+Direct opening requires a [netCDF library with HDF4 support](https://unidata.github.io/netcdf4-python/),
+as verified in the project environment. The raw file is read without automatic
+masking or scaling; only the map display is decoded.
+
 ## After pulling team changes
 
 From the repository root, run:
