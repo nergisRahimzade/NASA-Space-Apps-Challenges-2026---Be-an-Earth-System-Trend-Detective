@@ -1,0 +1,172 @@
+{
+  "status": "clean_dataset_saved_and_reopened",
+  "product": "MOD11C3.061",
+  "output_filename": "clean.nc",
+  "output_bytes": 1652187,
+  "output_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "source_manifest_sha256": "367f6bdc3654ff4e71050e3547c443f9dfea3dd6371b3b7238b0431e59284f40",
+  "dimensions": {
+    "time": 264,
+    "lat": 12,
+    "lon": 16
+  },
+  "source_variable_names": {
+    "LST_Day_CMG": "lst_day",
+    "LST_Night_CMG": "lst_night",
+    "QC_Day": "qc_day",
+    "QC_Night": "qc_night",
+    "Day_view_time": "day_view_time",
+    "Night_view_time": "night_view_time",
+    "Day_view_angl": "day_view_angle",
+    "Night_view_angl": "night_view_angle",
+    "Clear_sky_days": "clear_sky_days",
+    "Clear_sky_nights": "clear_sky_nights",
+    "Emis_20": "emissivity_20",
+    "Emis_22": "emissivity_22",
+    "Emis_23": "emissivity_23",
+    "Emis_29": "emissivity_29",
+    "Emis_31": "emissivity_31",
+    "Emis_32": "emissivity_32",
+    "Percent_land_in_grid": "percent_land"
+  },
+  "first_month": "2003-01",
+  "last_month": "2024-12",
+  "latitude_centers": [
+    33.775,
+    33.224999999999994
+  ],
+  "longitude_centers": [
+    -112.375,
+    -111.625
+  ],
+  "variables": {
+    "lst_day": {
+      "dtype": "float64",
+      "units": "degC",
+      "missing_cells": 0,
+      "min": 11.510000000000048,
+      "max": 56.910000000000025
+    },
+    "lst_night": {
+      "dtype": "float64",
+      "units": "degC",
+      "missing_cells": 0,
+      "min": -1.1099999999999568,
+      "max": 36.53000000000003
+    },
+    "qc_day": {
+      "dtype": "uint8",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.0,
+      "max": 185.0
+    },
+    "qc_night": {
+      "dtype": "uint8",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.0,
+      "max": 137.0
+    },
+    "day_view_time": {
+      "dtype": "float64",
+      "units": "hrs",
+      "missing_cells": 0,
+      "min": 17.400000000000002,
+      "max": 18.8
+    },
+    "night_view_time": {
+      "dtype": "float64",
+      "units": "hrs",
+      "missing_cells": 0,
+      "min": 4.6000000000000005,
+      "max": 5.800000000000001
+    },
+    "day_view_angle": {
+      "dtype": "float64",
+      "units": "degrees",
+      "missing_cells": 0,
+      "min": -12.0,
+      "max": 38.0
+    },
+    "night_view_angle": {
+      "dtype": "float64",
+      "units": "degrees",
+      "missing_cells": 0,
+      "min": -24.0,
+      "max": 17.0
+    },
+    "clear_sky_days": {
+      "dtype": "uint32",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 4112333.0,
+      "max": 2147483647.0
+    },
+    "clear_sky_nights": {
+      "dtype": "uint32",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 36863.0,
+      "max": 2147483647.0
+    },
+    "emissivity_20": {
+      "dtype": "float64",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.8320000000000001,
+      "max": 0.968
+    },
+    "emissivity_22": {
+      "dtype": "float64",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.8180000000000001,
+      "max": 0.968
+    },
+    "emissivity_23": {
+      "dtype": "float64",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.8340000000000001,
+      "max": 0.964
+    },
+    "emissivity_29": {
+      "dtype": "float64",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.906,
+      "max": 0.984
+    },
+    "emissivity_31": {
+      "dtype": "float64",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.962,
+      "max": 0.978
+    },
+    "emissivity_32": {
+      "dtype": "float64",
+      "units": "1",
+      "missing_cells": 0,
+      "min": 0.97,
+      "max": 0.986
+    },
+    "percent_land": {
+      "dtype": "float64",
+      "units": "%",
+      "missing_cells": 0,
+      "min": 100.0,
+      "max": 100.0
+    }
+  },
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "all_missing_nighttime_months": [],
+  "netcdf_roundtrip": "All values, coordinates and types matched",
+  "map_filename": "clean_maps.png",
+  "map_months": [
+    "2024-01",
+    "2024-05",
+    "2024-07"
+  ]
+}
