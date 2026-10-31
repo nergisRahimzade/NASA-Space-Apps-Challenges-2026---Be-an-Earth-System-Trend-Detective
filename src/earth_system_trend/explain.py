@@ -5,22 +5,25 @@ ESD-D03-BE. Rules:
 - Each call has a timeout; transient failures get exactly one retry.
 - explain() never raises. On any failure it returns fallback text built only
   from the numbers in the result, so the dashboard always has something to show.
+
+ESD-D04-BE: settings come from config.py, and successful answers are cached
+by a hash of the exact input, so a repeat call skips the API.
 """
 
 from __future__ import annotations
 
 import json
 import logging
-import os
 import time
 from typing import Any
 
 import openai
 
+from .cache import cache_get, cache_put, make_key
+from .config import get_settings
+
 logger = logging.getLogger(__name__)
 
-DEFAULT_MODEL = "gpt-4o-mini"
-DEFAULT_TIMEOUT_S = 15.0
 MAX_ATTEMPTS = 2  # first try + 1 retry
 RETRY_DELAY_S = 1.0
 SIGNIFICANCE_LEVEL = 0.05
@@ -54,23 +57,31 @@ def explain(
     `client` can be injected (tests pass a mock). Otherwise one is built from
     environment variables. This function never raises.
     """
-    model = model or os.getenv("OPENAI_MODEL", DEFAULT_MODEL)
-    timeout = timeout if timeout is not None else _env_float(
-        "OPENAI_TIMEOUT_S", DEFAULT_TIMEOUT_S
-    )
-
-    if client is None:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            logger.warning("OPENAI_API_KEY not set; using fallback text.")
-            return fallback_text(result)
-        # SDK retries disabled so our own retry policy is the only one.
-        client = openai.OpenAI(api_key=api_key, timeout=timeout, max_retries=0)
+    settings = get_settings()
+    model = model or settings.openai_model
+    timeout = timeout if timeout is not None else settings.openai_timeout_s
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": json.dumps(result, default=str)},
     ]
+
+    # Same model + same prompt + same numbers = same answer, so reuse it.
+    cache_key = make_key({"model": model, "messages": messages})
+    cached = cache_get(settings.explain_cache_path, cache_key)
+    if cached is not None:
+        logger.info("Explanation cache hit; skipping the API call.")
+        return cached
+    logger.info("Explanation cache miss; calling the model.")
+
+    if client is None:
+        if not settings.openai_api_key:
+            logger.warning("OPENAI_API_KEY not set; using fallback text.")
+            return fallback_text(result)
+        # SDK retries disabled so our own retry policy is the only one.
+        client = openai.OpenAI(
+            api_key=settings.openai_api_key, timeout=timeout, max_retries=0
+        )
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
@@ -79,6 +90,7 @@ def explain(
             )
             text = (response.choices[0].message.content or "").strip()
             if text:
+                cache_put(settings.explain_cache_path, cache_key, text)
                 return text
             logger.warning("Empty reply from model (attempt %d).", attempt)
         except TRANSIENT_ERRORS as exc:
@@ -120,10 +132,3 @@ def fallback_text(result: dict[str, Any]) -> str:
 
 def _is_number(value: Any) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
-
-
-def _env_float(name: str, default: float) -> float:
-    try:
-        return float(os.getenv(name, default))
-    except ValueError:
-        return default
