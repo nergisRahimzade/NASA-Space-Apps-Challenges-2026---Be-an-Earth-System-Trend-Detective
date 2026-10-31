@@ -27,5 +27,6 @@ data/processed/
 # Tool Caches
 .pytest_cache
 .ruff_cache
-# Local datasets
-/data/
+# Local datasets; only the small file manifest is shared
+/data/*
+!/data/manifest.csv

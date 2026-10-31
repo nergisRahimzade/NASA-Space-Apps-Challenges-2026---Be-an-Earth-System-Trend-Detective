@@ -2,9 +2,12 @@
 
 import argparse
 import contextlib
+import csv
 import hashlib
 import io
 import json
+import os
+import tempfile
 from datetime import UTC, date, datetime
 from decimal import ROUND_CEILING, Decimal
 from pathlib import Path
@@ -84,6 +87,60 @@ def check_file(path, expected_bytes, tolerance):
         raise DownloadError(f"Download size differs from the catalogue: {path.name}")
 
 
+def calendar_months(start, end):
+    first, last = date.fromisoformat(start), date.fromisoformat(end)
+    if first > last:
+        raise DownloadError("Start date must not be after end date.")
+    return [
+        f"{index // 12:04d}-{index % 12 + 1:02d}"
+        for index in range(first.year * 12 + first.month - 1, last.year * 12 + last.month)
+    ]
+
+
+def write_manifest(report, output_dir, manifest_path):
+    expected = calendar_months(report["period"]["start"], report["period"]["end"])
+    records = report.get("files", [])
+    months = [record["month"] for record in records]
+    if (report.get("status") != "files_verified"
+            or report.get("verified_count") != len(expected)
+            or len(records) != len(expected) or sorted(months) != expected):
+        raise DownloadError("Manifest requires exactly one verified file for every requested month.")
+    names = [record["filename"] for record in records]
+    output_dir, manifest_path = Path(output_dir).resolve(), Path(manifest_path).resolve()
+    actual = {path.name for path in output_dir.glob("*.hdf") if path.is_file()}
+    if len(set(names)) != len(expected) or actual != set(names):
+        raise DownloadError("HDF4 files on disk do not match the complete monthly file list.")
+    rows = []
+    for record in sorted(records, key=lambda item: item["month"]):
+        path = output_dir / record["filename"]
+        if path.stat().st_size != record["bytes"]:
+            raise DownloadError(f"File changed since verification: {path.name}")
+        rows.append({
+            "month": record["month"], "filename": path.name,
+            "relative_path": Path(os.path.relpath(path, manifest_path.parent)).as_posix(),
+            "bytes": record["bytes"], "sha256": record["sha256"],
+        })
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", newline="", encoding="utf-8", dir=manifest_path.parent,
+            prefix=".manifest-", suffix=".tmp", delete=False,
+        ) as stream:
+            temporary = Path(stream.name)
+            writer = csv.DictWriter(
+                stream, fieldnames=["month", "filename", "relative_path", "bytes", "sha256"],
+                lineterminator="\n",
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+        temporary.replace(manifest_path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    return len(rows)
+
+
 def download_samples(start, end, count, output_dir, interactive=False):
     if count < 1 or date.fromisoformat(start) > date.fromisoformat(end):
         raise DownloadError("Use a positive count and a valid start/end date range.")
@@ -106,6 +163,8 @@ def download_samples(start, end, count, output_dir, interactive=False):
     ]
     if len(set(names)) != count or len(set(months)) != count:
         raise DownloadError("Search returned duplicate filenames or months.")
+    if count == len(calendar_months(start, end)) and sorted(months) != calendar_months(start, end):
+        raise DownloadError("Search did not return every month in the requested period.")
 
     output_dir = Path(output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -120,9 +179,10 @@ def download_samples(start, end, count, output_dir, interactive=False):
             missing.append(granule)
 
     if missing:
+        print(f"Found {count} monthly files: {len(existing)} existing, {len(missing)} to download.")
         authenticate(interactive=interactive)
         paths = earthaccess.download(
-            missing, local_path=output_dir, threads=min(3, len(missing)), show_progress=False
+            missing, local_path=output_dir, threads=min(3, len(missing)), show_progress=interactive
         )
         expected = {output_dir / name for name in names if name not in existing}
         returned = {Path(path).resolve() for path in paths}
@@ -159,11 +219,14 @@ def main(argv=None):
     parser.add_argument("--count", type=int, default=3)
     parser.add_argument("--output", type=Path, default=Path("data/raw/day4_sample"))
     parser.add_argument("--report", type=Path, default=Path("data/day4_download_check.json"))
+    parser.add_argument("--manifest", type=Path, help="Write a complete monthly CSV after verification")
     parser.add_argument("--interactive", action="store_true", help="Log in once before the batch")
     args = parser.parse_args(argv)
     status = 0
     try:
         report = download_samples(args.start, args.end, args.count, args.output, args.interactive)
+        if args.manifest:
+            report["manifest_rows"] = write_manifest(report, args.output, args.manifest)
     except DownloadError as error:
         print(f"Download failed: {error}")
         report = {"status": "failed", "error_type": type(error).__name__,
@@ -180,6 +243,8 @@ def main(argv=None):
     if status == 0:
         print(f"Verified {report['verified_count']} files: {report['new_download_count']} new, "
               f"{report['reused_count']} already present. Report: {args.report}")
+        if args.manifest:
+            print(f"Manifest: {args.manifest} ({report['manifest_rows']} months)")
     return status
 
 
