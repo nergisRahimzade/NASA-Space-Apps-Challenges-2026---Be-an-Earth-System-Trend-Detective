@@ -84,6 +84,25 @@ Run this from the project root so the API can find `results.mock.json`. Then ope
 
 Stop the API with **Ctrl+C**. To serve a different results file, set the `RESULTS_PATH` environment variable before starting it.
 
+### 7. Configure settings (optional)
+
+Backend settings are read from environment variables by `src/earth_system_trend/config.py`. For local work, copy the example file and fill in what you need:
+
+```text
+cp .env.example .env
+```
+
+On Windows PowerShell, use `Copy-Item .env.example .env`. The `.env` file is git-ignored, so keys stay on your computer. On a server, set the same variables in the host's dashboard instead.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | not set | Enables AI explanations. Without it, a fallback summary is used. |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Model used for explanations. |
+| `OPENAI_TIMEOUT_S` | `15` | Seconds to wait for the model before giving up. |
+| `RESULTS_PATH` | `results.mock.json` | Results file served by `/results`. |
+| `EXPLAIN_CACHE_PATH` | `data/cache/explanations.json` | Where explanations are cached. A repeat request with the same input reuses the saved answer instead of calling the API. Delete the file to clear the cache. |
+| `LOG_LEVEL` | `INFO` | How much the API logs (`DEBUG`, `INFO`, `WARNING`). |
+
 ## NASA Earthdata access
 
 This step is needed when working on data downloads, but is not required to launch the starter dashboard.
@@ -105,7 +124,7 @@ exit()
 
 Enter your own username and password when prompted. A successful authentication prints `True`. This check authenticates the current Python session; download scripts should also call `earthaccess.login()` when implemented. See the [earthaccess authentication guide](https://earthaccess.readthedocs.io/en/latest/user/explanation/authenticate/).
 
-Keep credentials out of source code and Git. The existing `.gitignore` excludes `.env` files, `.netrc`, `_netrc`, and `.streamlit/secrets.toml`. Installing the OpenAI package does not configure AI access. The starter makes no AI calls and does not load `.env` files; configuration instructions should be added alongside that feature.
+Keep credentials out of source code and Git. The existing `.gitignore` excludes `.env` files, `.netrc`, `_netrc`, and `.streamlit/secrets.toml`. Installing the OpenAI package does not configure AI access; set `OPENAI_API_KEY` in your `.env` file as described in step 7.
 
 ## Download a three-file sample (Day 4)
 
