@@ -1,11 +1,11 @@
 ﻿import streamlit as st
+
+from api_client import API_URL, load_choices, load_results, load_series
 from charts import make_chart
 from components import empty_state, error_state, stat_card
 from maps import make_map
 from mock_map import mock_points
 from theme import apply_theme
-
-from api_client import API_URL, load_results, load_series
 
 st.set_page_config(
     page_title="Earth System Trend Detective",
