@@ -177,6 +177,21 @@ The command saves `docs/evidence/day7/combined_check.json`. See
 [combined data notes](docs/combined_data_notes.md) for units, fill values and
 remaining cleaning work. No large combined data file is written.
 
+## Clean the Phoenix data (Day 8)
+
+```sh
+uv run --locked python src/clean_data.py
+```
+
+This saves `data/processed/clean.nc` with 264 months, 12 latitude cells and 16
+longitude cells. It masks numeric fill/range values, decodes physical units,
+converts LST to Celsius, renames fields and selects Phoenix with `.sel()`.
+Quality flags and clear-sky bitmaps retain their original integer values.
+
+The saved file is reopened and checked. The report and three monthly maps are
+under `docs/evidence/day8/`; see [clean data notes](docs/clean_data_notes.md).
+The production QC policy remains pending.
+
 ## After pulling team changes
 
 From the repository root, run:
