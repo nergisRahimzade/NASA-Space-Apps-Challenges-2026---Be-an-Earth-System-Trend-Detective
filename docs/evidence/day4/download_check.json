@@ -1,0 +1,54 @@
+{
+  "status": "files_verified",
+  "checked_at_utc": "2026-10-30T18:44:06.368881+00:00",
+  "product": "MOD11C3.061",
+  "bounding_box": [
+    -112.4,
+    33.2,
+    -111.6,
+    33.8
+  ],
+  "period": {
+    "start": "2003-01-01",
+    "end": "2003-03-31"
+  },
+  "requested_count": 3,
+  "verified_count": 3,
+  "new_download_count": 3,
+  "reused_count": 0,
+  "checks": [
+    "expected filenames",
+    "distinct months",
+    "catalogue sizes",
+    "HDF4 signatures"
+  ],
+  "files": [
+    {
+      "filename": "MOD11C3.A2003001.061.2020149221031.hdf",
+      "month": "2003-01",
+      "bytes": 73021397,
+      "catalogue_bytes": 73021365,
+      "size_rounding_tolerance_bytes": 53,
+      "sha256": "c5860babf4e15196fc983ae9d8525b91fd0009f2a21e487c9c7cf7b6945899ad",
+      "already_present": false
+    },
+    {
+      "filename": "MOD11C3.A2003032.061.2020149224244.hdf",
+      "month": "2003-02",
+      "bytes": 72982060,
+      "catalogue_bytes": 72982043,
+      "size_rounding_tolerance_bytes": 53,
+      "sha256": "04fe3139b5770cf252caa8fc6a42332b9002f62df764df74b703cd340e99f590",
+      "already_present": false
+    },
+    {
+      "filename": "MOD11C3.A2003060.061.2020149231313.hdf",
+      "month": "2003-03",
+      "bytes": 75389135,
+      "catalogue_bytes": 75389154,
+      "size_rounding_tolerance_bytes": 53,
+      "sha256": "0a974a56ba9d9c4fcab6dd249aecf6c3934921863f059c71d14c3fa82dbf3022",
+      "already_present": false
+    }
+  ]
+}
