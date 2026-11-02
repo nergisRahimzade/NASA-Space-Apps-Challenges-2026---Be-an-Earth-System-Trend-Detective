@@ -17,3 +17,19 @@ def load_results():
     except requests.RequestException:
         with open(MOCK_FILE, encoding="utf-8") as f:
             return json.load(f), "local results.mock.json"
+
+
+def load_series(region, variable):
+    """Fetch one series from GET /series and return the parsed JSON.
+
+    Raises requests.RequestException if the API can't be reached or answers
+    with an error. There is no local fallback: only the default selection
+    exists in results.mock.json.
+    """
+    response = requests.get(
+        f"{API_URL}/series",
+        params={"region": region, "variable": variable},
+        timeout=3,
+    )
+    response.raise_for_status()
+    return response.json()
