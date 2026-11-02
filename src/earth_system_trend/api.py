@@ -1,19 +1,20 @@
 """Day 2 API: serves the mock results so FE can build against it."""
 
 import json
-import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 
-DEFAULT_RESULTS_PATH = "results.mock.json"
+from .config import configure_logging, get_settings
+
+configure_logging()
 
 app = FastAPI(title="Earth System Trend Detective API")
 
 
 def results_path() -> Path:
     # Read per request so tests (and later USE_MOCK switching) can change it.
-    return Path(os.environ.get("RESULTS_PATH", DEFAULT_RESULTS_PATH))
+    return get_settings().results_path
 
 
 @app.get("/health")
