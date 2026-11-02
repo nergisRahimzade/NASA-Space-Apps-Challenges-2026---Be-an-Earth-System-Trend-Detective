@@ -1,7 +1,11 @@
 ﻿import streamlit as st
-
-from api_client import API_URL, load_choices, load_results, load_series
 from charts import make_chart
+from components import empty_state, error_state, stat_card
+from maps import make_map
+from mock_map import mock_points
+from theme import apply_theme
+
+from api_client import API_URL, load_results, load_series
 
 st.set_page_config(
     page_title="Earth System Trend Detective",
@@ -147,7 +151,25 @@ with p_col:
 chart_col, know_col = st.columns([2, 1])
 
 with chart_col.container(border=True):
-    st.plotly_chart(make_chart(v))
+    st.subheader("Line chart")
+    if series_error is not None:
+        error_state(
+            "Could not load this series.",
+            f"The API did not return data for {region} / {variable}. "
+            f"Details: {series_error}",
+        )
+    elif any(x is not None for x in chart_v["values"]):
+        st.plotly_chart(make_chart(chart_v), theme=None)
+        if chart_v["slope"] is None:
+            st.caption(
+                "No trend line: trend statistics for this selection "
+                "are not available yet."
+            )
+    else:
+        empty_state(
+            "No data to chart for this selection.",
+            "Try a different region or period.",
+        )
 
 with know_col.container(border=True):
     st.subheader("How we know")
