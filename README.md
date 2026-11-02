@@ -162,6 +162,21 @@ Direct opening requires a [netCDF library with HDF4 support](https://unidata.git
 as verified in the project environment. The raw file is read without automatic
 masking or scaling; only the map display is decoded.
 
+## Combine the monthly files (Day 7)
+
+```sh
+uv run --locked python src/combine_data.py
+```
+
+This reads `data/manifest.csv`, verifies each source file's dates, grid and
+variable metadata, then opens all 264 months as one lazy xarray dataset. It adds
+month-start time coordinates and checks for gaps or duplicates. Packed values
+and the original global grid are retained.
+
+The command saves `docs/evidence/day7/combined_check.json`. See
+[combined data notes](docs/combined_data_notes.md) for units, fill values and
+remaining cleaning work. No large combined data file is written.
+
 ## After pulling team changes
 
 From the repository root, run:
