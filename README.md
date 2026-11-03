@@ -71,7 +71,7 @@ Open the local URL printed in the terminal, usually `http://localhost:8501`. You
 
 ### 6. Start the API
 
-The API serves analysis results to the dashboard. It currently returns the mock file `results.mock.json` from the project root.
+The API serves analysis results to the dashboard. By default it serves the mock file `results.mock.json` from the project root; see `USE_MOCK` in step 7.
 
 ```text
 uv run --locked uvicorn earth_system_trend.api:app --reload
@@ -81,6 +81,11 @@ Run this from the project root so the API can find `results.mock.json`. Then ope
 
 - `http://localhost:8000/health` should return `{"status": "ok"}`. This checks that the server is running.
 - `http://localhost:8000/results` returns the contents of `results.mock.json` (see `docs/contract.md`).
+- `http://localhost:8000/series?region=Example%20Region` returns one monthly series (region, variable, units, period and the monthly values) for the chart. An optional `&variable=...` narrows it. A region or variable with no data returns 404.
+- `http://localhost:8000/trend` returns just the trend numbers (slope, p-value, tau, direction) and the explanation, for the stat cards.
+- `http://localhost:8000/docs` lists every endpoint and lets you try them.
+
+`/results`, `/series` and `/trend` check the results file against `docs/contract.md` first. A missing file returns 404; a file that breaks the contract returns 500 with a message naming the bad field.
 
 Stop the API with **Ctrl+C**. To serve a different results file, set the `RESULTS_PATH` environment variable before starting it.
 
@@ -99,9 +104,39 @@ On Windows PowerShell, use `Copy-Item .env.example .env`. The `.env` file is git
 | `OPENAI_API_KEY` | not set | Enables AI explanations. Without it, a fallback summary is used. |
 | `OPENAI_MODEL` | `gpt-4o-mini` | Model used for explanations. |
 | `OPENAI_TIMEOUT_S` | `15` | Seconds to wait for the model before giving up. |
-| `RESULTS_PATH` | `results.mock.json` | Results file served by `/results`. |
+| `USE_MOCK` | `true` | `true` serves the fake `results.mock.json`; `false` serves the real `results/results.json` made by the pipeline. |
+| `RESULTS_PATH` | not set | Serve this results file instead, whatever `USE_MOCK` says. |
+| `SERIES_CSV_PATH` | `data/processed/timeseries.csv` | The Data layer's monthly `date,value` CSV that the pipeline reads. |
 | `EXPLAIN_CACHE_PATH` | `data/cache/explanations.json` | Where explanations are cached. A repeat request with the same input reuses the saved answer instead of calling the API. Delete the file to clear the cache. |
 | `LOG_LEVEL` | `INFO` | How much the API logs (`DEBUG`, `INFO`, `WARNING`). |
+| `CORS_ORIGINS` | `http://localhost:8501` | Comma-separated web addresses whose pages may call the API from a browser. Add the deployed dashboard's address here. |
+| `RATE_LIMIT_PER_MINUTE` | `60` | Requests each visitor may make per minute (`/health` is exempt). `0` turns the limit off. |
+| `API_URL` | `http://localhost:8000` | Where the dashboard and `scripts/smoke_test.py` find the API. |
+
+To check that a running API answers its main endpoints, run `uv run --locked python scripts/smoke_test.py`, or pass the deployed address: `uv run --locked python scripts/smoke_test.py https://<service-name>.onrender.com`.
+
+### 8. Build results.json with one command
+
+The pipeline reads the Data layer's monthly CSV (`data/processed/timeseries.csv`, columns `date,value`), runs the trend test, asks the AI for an explanation, checks everything against `docs/contract.md`, and saves `results/results.json`:
+
+```text
+uv run --locked python -m earth_system_trend.run
+```
+
+Before real data exists, add `--stub` to write a fake CSV first and try the whole chain. The command skips the work if `results/results.json` is already newer than the CSV; add `--force` to rebuild. To serve the new file, set `USE_MOCK=false` (step 7) and restart the API.
+
+### 9. Run the API in Docker and deploy it
+
+The `Dockerfile` packages the API so it runs the same everywhere. With [Docker](https://docs.docker.com/get-started/get-docker/) installed:
+
+```text
+docker build -t esd-api .
+docker run -p 8000:8000 --env-file .env esd-api
+```
+
+Then open `http://localhost:8000/health`. Leave out `--env-file .env` if you have no `.env` file.
+
+To deploy on [Render](https://render.com/docs/docker): create a **Web Service** from this GitHub repository, choose **Docker** as the language, and add the environment variables from step 7 in the service's **Environment** settings, never in the repository. Render sets `PORT` itself. When the deploy finishes, open `https://<service-name>.onrender.com/health`; it should return `{"status": "ok"}`.
 
 ## NASA Earthdata access
 

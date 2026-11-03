@@ -19,6 +19,7 @@ dependencies = [
     "openai>=3.36.0",
     "pandas>=3.0.6",
     "plotly>=7.1.0",
+    "pydantic>=2.14.1",
     "pymannkendall>=1.4.3",
     "python-dotenv>=1.2.4",
     "requests>=2.34.2",
