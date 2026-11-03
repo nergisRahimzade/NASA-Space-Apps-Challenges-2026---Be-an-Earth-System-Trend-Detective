@@ -101,7 +101,9 @@ On Windows PowerShell, use `Copy-Item .env.example .env`. The `.env` file is git
 | `OPENAI_API_KEY` | not set | Enables AI explanations. Without it, a fallback summary is used. |
 | `OPENAI_MODEL` | `gpt-4o-mini` | Model used for explanations. |
 | `OPENAI_TIMEOUT_S` | `15` | Seconds to wait for the model before giving up. |
-| `RESULTS_PATH` | `results.mock.json` | Results file served by `/results`. |
+| `USE_MOCK` | `true` | `true` serves the fake `results.mock.json`; `false` serves the real `results/results.json` made by the pipeline. |
+| `RESULTS_PATH` | not set | Serve this results file instead, whatever `USE_MOCK` says. |
+| `SERIES_CSV_PATH` | `data/processed/timeseries.csv` | The Data layer's monthly `date,value` CSV that the pipeline reads. |
 | `EXPLAIN_CACHE_PATH` | `data/cache/explanations.json` | Where explanations are cached. A repeat request with the same input reuses the saved answer instead of calling the API. Delete the file to clear the cache. |
 | `LOG_LEVEL` | `INFO` | How much the API logs (`DEBUG`, `INFO`, `WARNING`). |
 | `CORS_ORIGINS` | `http://localhost:8501` | Comma-separated web addresses whose pages may call the API from a browser. Add the deployed dashboard's address here. |
@@ -110,7 +112,17 @@ On Windows PowerShell, use `Copy-Item .env.example .env`. The `.env` file is git
 
 To check that a running API answers its main endpoints, run `uv run --locked python scripts/smoke_test.py`, or pass the deployed address: `uv run --locked python scripts/smoke_test.py https://<service-name>.onrender.com`.
 
-### 8. Run the API in Docker and deploy it
+### 8. Build results.json with one command
+
+The pipeline reads the Data layer's monthly CSV (`data/processed/timeseries.csv`, columns `date,value`), runs the trend test, asks the AI for an explanation, checks everything against `docs/contract.md`, and saves `results/results.json`:
+
+```text
+uv run --locked python -m earth_system_trend.run
+```
+
+Before real data exists, add `--stub` to write a fake CSV first and try the whole chain. The command skips the work if `results/results.json` is already newer than the CSV; add `--force` to rebuild. To serve the new file, set `USE_MOCK=false` (step 7) and restart the API.
+
+### 9. Run the API in Docker and deploy it
 
 The `Dockerfile` packages the API so it runs the same everywhere. With [Docker](https://docs.docker.com/get-started/get-docker/) installed:
 
