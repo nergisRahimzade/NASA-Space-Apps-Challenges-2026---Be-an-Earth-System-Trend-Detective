@@ -103,6 +103,19 @@ On Windows PowerShell, use `Copy-Item .env.example .env`. The `.env` file is git
 | `EXPLAIN_CACHE_PATH` | `data/cache/explanations.json` | Where explanations are cached. A repeat request with the same input reuses the saved answer instead of calling the API. Delete the file to clear the cache. |
 | `LOG_LEVEL` | `INFO` | How much the API logs (`DEBUG`, `INFO`, `WARNING`). |
 
+### 8. Run the API in Docker and deploy it
+
+The `Dockerfile` packages the API so it runs the same everywhere. With [Docker](https://docs.docker.com/get-started/get-docker/) installed:
+
+```text
+docker build -t esd-api .
+docker run -p 8000:8000 --env-file .env esd-api
+```
+
+Then open `http://localhost:8000/health`. Leave out `--env-file .env` if you have no `.env` file.
+
+To deploy on [Render](https://render.com/docs/docker): create a **Web Service** from this GitHub repository, choose **Docker** as the language, and add the environment variables from step 7 in the service's **Environment** settings, never in the repository. Render sets `PORT` itself. When the deploy finishes, open `https://<service-name>.onrender.com/health`; it should return `{"status": "ok"}`.
+
 ## NASA Earthdata access
 
 This step is needed when working on data downloads, but is not required to launch the starter dashboard.
