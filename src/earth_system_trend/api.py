@@ -3,7 +3,6 @@
 Run it with:  uv run --locked uvicorn earth_system_trend.api:app --reload
 """
 
-import json
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
@@ -57,13 +56,8 @@ def health() -> dict:
 
 @app.get("/results")
 def get_results() -> dict:
-    path = results_path()
-    if not path.exists():
-        raise HTTPException(status_code=404, detail=f"Results file not found: {path}")
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        raise HTTPException(status_code=500, detail=f"Results file is not valid JSON: {exc}")
+    """The whole results file, checked against the contract first (ESD-D10-BE)."""
+    return load_current_results().model_dump()
 
 
 def load_current_results() -> Results:
@@ -102,4 +96,21 @@ def get_series(region: str, variable: str | None = None) -> dict:
         "units": results.units,
         "period": results.period.model_dump(),
         "series": [point.model_dump() for point in results.series],
+    }
+
+
+@app.get("/trend")
+def get_trend() -> dict:
+    """ESD-D10-BE. The trend numbers and explanation, for the stat cards and AI box.
+
+    Same checks as /results: 404 if the file is missing, 500 if it breaks the contract.
+    """
+    results = load_current_results()
+    return {
+        "region": results.region,
+        "variable": results.variable,
+        "units": results.units,
+        "period": results.period.model_dump(),
+        "trend": results.trend.model_dump(),
+        "explanation": results.explanation,
     }
