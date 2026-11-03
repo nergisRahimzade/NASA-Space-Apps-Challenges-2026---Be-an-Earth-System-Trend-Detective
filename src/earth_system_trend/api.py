@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import configure_logging, get_settings
+from .contract import ContractError, Results, load_results
 from .rate_limit import RateLimiter
 
 configure_logging()
@@ -63,3 +64,42 @@ def get_results() -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=500, detail=f"Results file is not valid JSON: {exc}")
+
+
+def load_current_results() -> Results:
+    """Load the results file the settings point at, checked against the contract.
+
+    Answers 404 if the file is missing and 500 if it is broken, with a message
+    that says what is wrong.
+    """
+    path = results_path()
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"Results file not found: {path}")
+    try:
+        return load_results(path)
+    except ContractError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+def _same(a: str, b: str) -> bool:
+    return a.strip().casefold() == b.strip().casefold()
+
+
+@app.get("/series")
+def get_series(region: str, variable: str | None = None) -> dict:
+    """ESD-D08-BE. One monthly series, for the time-series chart.
+
+    Example: /series?region=Phoenix%20study%20area&variable=...
+    `variable` is optional. Answers 404 if there is no data for that choice.
+    """
+    results = load_current_results()
+    if not _same(region, results.region) or (variable and not _same(variable, results.variable)):
+        wanted = region if not variable else f"{region} / {variable}"
+        raise HTTPException(status_code=404, detail=f"No series for {wanted}")
+    return {
+        "region": results.region,
+        "variable": results.variable,
+        "units": results.units,
+        "period": results.period.model_dump(),
+        "series": [point.model_dump() for point in results.series],
+    }
