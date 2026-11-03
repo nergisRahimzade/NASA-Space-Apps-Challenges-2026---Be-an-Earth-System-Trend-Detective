@@ -102,6 +102,11 @@ On Windows PowerShell, use `Copy-Item .env.example .env`. The `.env` file is git
 | `RESULTS_PATH` | `results.mock.json` | Results file served by `/results`. |
 | `EXPLAIN_CACHE_PATH` | `data/cache/explanations.json` | Where explanations are cached. A repeat request with the same input reuses the saved answer instead of calling the API. Delete the file to clear the cache. |
 | `LOG_LEVEL` | `INFO` | How much the API logs (`DEBUG`, `INFO`, `WARNING`). |
+| `CORS_ORIGINS` | `http://localhost:8501` | Comma-separated web addresses whose pages may call the API from a browser. Add the deployed dashboard's address here. |
+| `RATE_LIMIT_PER_MINUTE` | `60` | Requests each visitor may make per minute (`/health` is exempt). `0` turns the limit off. |
+| `API_URL` | `http://localhost:8000` | Where the dashboard and `scripts/smoke_test.py` find the API. |
+
+To check that a running API answers its main endpoints, run `uv run --locked python scripts/smoke_test.py`, or pass the deployed address: `uv run --locked python scripts/smoke_test.py https://<service-name>.onrender.com`.
 
 ### 8. Run the API in Docker and deploy it
 

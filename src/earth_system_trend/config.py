@@ -24,6 +24,8 @@ DEFAULT_MODEL = "gpt-4o-mini"
 DEFAULT_TIMEOUT_S = 15.0
 DEFAULT_CACHE_PATH = "data/cache/explanations.json"
 DEFAULT_LOG_LEVEL = "INFO"
+DEFAULT_CORS_ORIGINS = "http://localhost:8501"
+DEFAULT_RATE_LIMIT_PER_MINUTE = 60
 
 
 @dataclass(frozen=True)
@@ -36,6 +38,8 @@ class Settings:
     openai_timeout_s: float
     explain_cache_path: Path
     log_level: str
+    cors_origins: list[str]
+    rate_limit_per_minute: int
 
 
 def get_settings() -> Settings:
@@ -51,6 +55,8 @@ def get_settings() -> Settings:
         openai_timeout_s=_env_float("OPENAI_TIMEOUT_S", DEFAULT_TIMEOUT_S),
         explain_cache_path=Path(os.getenv("EXPLAIN_CACHE_PATH", DEFAULT_CACHE_PATH)),
         log_level=(os.getenv("LOG_LEVEL") or DEFAULT_LOG_LEVEL).upper(),
+        cors_origins=_env_list("CORS_ORIGINS", DEFAULT_CORS_ORIGINS),
+        rate_limit_per_minute=_env_int("RATE_LIMIT_PER_MINUTE", DEFAULT_RATE_LIMIT_PER_MINUTE),
     )
 
 
@@ -69,3 +75,17 @@ def _env_float(name: str, default: float) -> float:
         return float(os.getenv(name, default))
     except ValueError:
         return default
+
+
+def _env_int(name: str, default: int) -> int:
+    """Read a whole number from the environment, falling back to default if unset or invalid."""
+    try:
+        return int(os.getenv(name, default))
+    except ValueError:
+        return default
+
+
+def _env_list(name: str, default: str) -> list[str]:
+    """Read a comma-separated list: "a, b,c" becomes ["a", "b", "c"]."""
+    raw = os.getenv(name, default)
+    return [item.strip() for item in raw.split(",") if item.strip()]
