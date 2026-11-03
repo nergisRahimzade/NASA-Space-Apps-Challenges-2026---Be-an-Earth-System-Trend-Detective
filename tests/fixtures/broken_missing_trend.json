@@ -1,0 +1,7 @@
+{
+  "region": "Test Region",
+  "variable": "Surface air temperature",
+  "units": "°C",
+  "period": { "start": "2000-01", "end": "2000-03" },
+  "series": [{ "date": "2000-01", "value": 1.2 }]
+}
