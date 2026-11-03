@@ -1,11 +1,17 @@
 ﻿import streamlit as st
-from charts import make_chart
+from charts import anomaly_available, chart_title, make_chart
 from components import empty_state, error_state, stat_card
 from maps import make_map
 from mock_map import mock_points
 from theme import apply_theme
 
-from api_client import API_URL, load_results, load_series
+from api_client import (
+    API_URL,
+    NoSeriesError,
+    load_choices,
+    load_results,
+    load_series,
+)
 
 st.set_page_config(
     page_title="Earth System Trend Detective",
@@ -14,11 +20,6 @@ st.set_page_config(
 )
 apply_theme()
 
-# Placeholder dropdown choices. The real list of regions is planned as an API
-# endpoint (Day 12) and the variable is not decided yet, so these stand in.
-EXTRA_REGIONS = ["Example Region B", "Example Region C"]
-EXTRA_VARIABLES = ["Example variable B"]
-
 
 @st.cache_data(ttl=60)
 def get_results():
@@ -26,8 +27,13 @@ def get_results():
 
 
 @st.cache_data(ttl=60)
-def get_series(region, variable):
-    return load_series(region, variable)
+def get_choices(default_region, default_variable):
+    return load_choices(default_region, default_variable)
+
+
+@st.cache_data(ttl=60)
+def get_series(region, variable, default_units):
+    return load_series(region, variable, default_units)
 
 
 # The only place that knows the contract's key names.
@@ -72,43 +78,34 @@ except (KeyError, TypeError) as exc:
 
 st.title("Earth System Trend Detective")
 
+region_choices, variable_choices = get_choices(v["region"], v["variable"])
 col_period, col_region, col_variable = st.columns(3)
 col_period.selectbox("Period", [f"{v['start']} to {v['end']}"])
-region = col_region.selectbox("Region", [v["region"], *EXTRA_REGIONS], key="region")
-variable = col_variable.selectbox(
-    "Variable", [v["variable"], *EXTRA_VARIABLES], key="variable"
-)
+region = col_region.selectbox("Region", region_choices, key="region")
+variable = col_variable.selectbox("Variable", variable_choices, key="variable")
 is_default = region == v["region"] and variable == v["variable"]
 
-# The default choice uses the results file. Any other choice asks GET /series.
+# The default choice uses the results file. Any other choice asks the API.
 chart_v = v
 series_error = None
+no_series = None
 if not is_default:
     try:
         with st.spinner("Loading series..."):
-            data = get_series(region, variable)
-        points = data["series"]
-        period = data.get("period", {})
-        chart_v = {
-            **v,
-            "region": data.get("region", region),
-            "variable": data.get("variable", variable),
-            "units": data.get("units", v["units"]),
-            "start": period.get("start", v["start"]),
-            "end": period.get("end", v["end"]),
-            "dates": [pt["date"] for pt in points],
-            "values": [pt["value"] for pt in points],
-            # No trend statistics exist for this choice yet, so no trend line.
-            "slope": None,
-            "intercept": None,
-        }
+            chart_v = {**v, **get_series(region, variable, v["units"])}
+    except NoSeriesError as exc:
+        no_series = exc
     except (OSError, ValueError, KeyError, TypeError) as exc:
         series_error = exc
+failed = series_error is not None or no_series is not None
 
-st.caption(
-    f"{chart_v['variable']} in {chart_v['region']}, "
-    f"{chart_v['start']} to {chart_v['end']}"
-)
+if failed:
+    st.caption(f"{variable} in {region}")
+else:
+    st.caption(
+        f"{chart_v['variable']} in {chart_v['region']}, "
+        f"{chart_v['start']} to {chart_v['end']}"
+    )
 if not is_default:
     st.info(
         "The chart follows your selection. The cards, map and AI explanation "
@@ -151,16 +148,42 @@ with p_col:
 chart_col, know_col = st.columns([2, 1])
 
 with chart_col.container(border=True):
-    st.subheader("Line chart")
+    can_anomaly = not failed and anomaly_available(
+        chart_v["dates"], chart_v["values"]
+    )
+    title_col, toggle_col = st.columns([3, 2])
+    mode = "raw"
+    if can_anomaly:
+        picked = toggle_col.radio(
+            "View",
+            ["Raw", "Anomaly"],
+            horizontal=True,
+            key="view_mode",
+            label_visibility="collapsed",
+        )
+        mode = picked.lower()
+    else:
+        toggle_col.caption("Anomaly view needs at least two years of monthly data.")
+    title_col.subheader(chart_title(mode))
+
     if series_error is not None:
         error_state(
             "Could not load this series.",
             f"The API did not return data for {region} / {variable}. "
             f"Details: {series_error}",
         )
+    elif no_series is not None:
+        empty_state("No data for this selection yet.", str(no_series))
     elif any(x is not None for x in chart_v["values"]):
-        st.plotly_chart(make_chart(chart_v), theme=None)
-        if chart_v["slope"] is None:
+        st.plotly_chart(make_chart(chart_v, mode), theme=None)
+        if mode == "anomaly":
+            st.caption(
+                "Anomaly = value minus the average for the same calendar month "
+                "over the whole period. Months seen once have no anomaly. "
+                "No trend line here until the team confirms which series the "
+                "slope is computed on."
+            )
+        elif chart_v["slope"] is None:
             st.caption(
                 "No trend line: trend statistics for this selection "
                 "are not available yet."
@@ -201,6 +224,6 @@ with st.container(border=True):
         empty_state("No explanation yet.", "It appears once the AI step has run.")
 
 footer = f"Showing results from: {source}"
-if not is_default and series_error is None:
+if not is_default and not failed:
     footer += f" · series from API at {API_URL}"
 st.caption(footer)
