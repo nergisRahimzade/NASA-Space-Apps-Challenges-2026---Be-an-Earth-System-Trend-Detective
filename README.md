@@ -71,7 +71,7 @@ Open the local URL printed in the terminal, usually `http://localhost:8501`. You
 
 ### 6. Start the API
 
-The API serves analysis results to the dashboard. It currently returns the mock file `results.mock.json` from the project root.
+The API serves analysis results to the dashboard. By default it serves the mock file `results.mock.json` from the project root; see `USE_MOCK` in step 7.
 
 ```text
 uv run --locked uvicorn earth_system_trend.api:app --reload
@@ -82,7 +82,10 @@ Run this from the project root so the API can find `results.mock.json`. Then ope
 - `http://localhost:8000/health` should return `{"status": "ok"}`. This checks that the server is running.
 - `http://localhost:8000/results` returns the contents of `results.mock.json` (see `docs/contract.md`).
 - `http://localhost:8000/series?region=Example%20Region` returns one monthly series (region, variable, units, period and the monthly values) for the chart. An optional `&variable=...` narrows it. A region or variable with no data returns 404.
+- `http://localhost:8000/trend` returns just the trend numbers (slope, p-value, tau, direction) and the explanation, for the stat cards.
 - `http://localhost:8000/docs` lists every endpoint and lets you try them.
+
+`/results`, `/series` and `/trend` check the results file against `docs/contract.md` first. A missing file returns 404; a file that breaks the contract returns 500 with a message naming the bad field.
 
 Stop the API with **Ctrl+C**. To serve a different results file, set the `RESULTS_PATH` environment variable before starting it.
 
