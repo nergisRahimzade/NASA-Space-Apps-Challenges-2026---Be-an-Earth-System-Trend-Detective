@@ -1,0 +1,17 @@
+# Keep the image small and keep secrets out of it.
+.venv
+.git
+.github
+data
+.env
+.env.*
+**/__pycache__
+.pytest_cache
+.ruff_cache
+notebooks
+docs
+app
+tests
+*.html
+*_files
+*.png
