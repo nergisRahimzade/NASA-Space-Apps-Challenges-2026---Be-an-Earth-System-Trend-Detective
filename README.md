@@ -137,7 +137,26 @@ docker run -p 8000:8000 --env-file .env esd-api
 Then open `http://localhost:8000/health`. Leave out `--env-file .env` if you have no `.env` file.
 
 To deploy on [Render](https://render.com/docs/docker): create a **Web Service** from this GitHub repository, choose **Docker** as the language, and add the environment variables from step 7 in the service's **Environment** settings, never in the repository. Render sets `PORT` itself. When the deploy finishes, open `https://<service-name>.onrender.com/health`; it should return `{"status": "ok"}`.
+#### Using the live API
 
+The team's API is deployed at **https://earthtrend.onrender.com**. This address is not a secret. To run the dashboard against it instead of a local API:
+
+**Windows PowerShell:**
+**or the vscode terminal powershell**
+```text
+$env:API_URL = "https://earthtrend.onrender.com"
+uv run --locked streamlit run app/streamlit_app.py
+```
+
+**macOS or Linux:**
+
+```text
+API_URL=https://earthtrend.onrender.com uv run --locked streamlit run app/streamlit_app.py
+```
+
+The bottom of the page should say **Showing results from: API at https://earthtrend.onrender.com**. The API runs on Render's free tier and sleeps after 15 minutes without requests. If the page shows mock data or an error, wait about 30 seconds and refresh.
+
+To check the live API directly: `uv run --locked python scripts/smoke_test.py https://earthtrend.onrender.com`
 ## NASA Earthdata access
 
 This step is needed when working on data downloads, but is not required to launch the starter dashboard.
