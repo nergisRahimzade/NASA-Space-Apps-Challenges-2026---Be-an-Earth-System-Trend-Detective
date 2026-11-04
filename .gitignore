@@ -27,5 +27,8 @@ data/processed/
 # Tool Caches
 .pytest_cache
 .ruff_cache
-# Local datasets
-/data/
+# Local datasets; share only the small monthly series
+/data/*
+!/data/processed/
+/data/processed/*
+!/data/processed/timeseries.csv

@@ -1,0 +1,28 @@
+{
+  "status": "monthly_series_saved_and_loaded",
+  "region": "Phoenix study area",
+  "source_variable": "lst_night",
+  "units": "degC",
+  "source_filename": "clean.nc",
+  "source_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "source_dimensions": {
+    "time": 264,
+    "lat": 12,
+    "lon": 16
+  },
+  "output_filename": "timeseries.csv",
+  "output_sha256": "32c803f6178dd68bd0ef58785a3d912eea11c79dd1ad0e3e8d450d31b205f38a",
+  "columns": [
+    "date",
+    "value"
+  ],
+  "row_count": 264,
+  "first_month": "2003-01",
+  "last_month": "2024-12",
+  "missing_values": [],
+  "min": 3.234912327684251,
+  "max": 33.53543273529108,
+  "weighting": "cos(deg2rad(lat)); weighted mean over lat and lon; skip NaN",
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "backend_loader_check": "All dates and values matched"
+}
