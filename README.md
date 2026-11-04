@@ -221,6 +221,20 @@ The small CSV is tracked; raw and cleaned datasets remain local. See
 [monthly series notes](docs/monthly_series_notes.md) for the method and inherited
 quality policy, and [the check record](docs/evidence/day9/series_check.json) for validation.
 
+## Calculate monthly anomalies (Day 10)
+
+```sh
+uv run --locked python -m earth_system_trend.anomaly
+```
+
+This reads `data/processed/timeseries.csv` and subtracts the 2003-2024 mean for
+each calendar month. It saves `data/processed/anomaly.csv` with the same
+`date,value` columns, in °C differences.
+
+The baseline means, counts and original-versus-anomaly plot are under
+`docs/evidence/day10/`. See [anomaly notes](docs/anomaly_notes.md) for the
+baseline definition and inherited quality policy.
+
 ## After pulling team changes
 
 From the repository root, run:
