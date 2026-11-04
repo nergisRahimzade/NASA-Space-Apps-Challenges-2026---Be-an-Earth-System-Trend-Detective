@@ -185,6 +185,23 @@ date window, file count or destination.
 
 Three-file live check: [download record](docs/evidence/day4/download_check.json).
 
+## Build the monthly series (Day 9)
+
+After producing `data/processed/clean.nc` in [Day 8](https://github.com/nergisRahimzade/NASA-Space-Apps-Challenges-2026---Be-an-Earth-System-Trend-Detective/pull/19), run:
+
+```sh
+uv run --locked python -m earth_system_trend.aggregate
+```
+
+This writes `data/processed/timeseries.csv`: one nighttime LST value in °C per
+month, using `cos(deg2rad(lat))` weights across Phoenix. The `date,value` columns
+work with the existing backend reader. A month with no data keeps its date and
+a blank value.
+
+The small CSV is tracked; raw and cleaned datasets remain local. See
+[monthly series notes](docs/monthly_series_notes.md) for the method and inherited
+quality policy, and [the check record](docs/evidence/day9/series_check.json) for validation.
+
 ## After pulling team changes
 
 From the repository root, run:
