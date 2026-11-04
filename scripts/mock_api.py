@@ -3,15 +3,19 @@
 Run from the repository root:
     uv run --locked python scripts/mock_api.py
 
-Endpoints:
+Endpoints, shaped like the real API the backend team described:
     GET  /health
-    GET  /results                  serves results.mock.json
-    GET  /series?region=...&variable=...   fake monthly series (variable optional)
+    GET  /results
+    GET  /regions
+    GET  /series?region=...&variable=...
+         region is required (422 if missing), variable is optional, matching
+         ignores case, and an unknown region or variable gives
+         404 {"detail": "No series for ..."}
     GET, POST  /practice/items     practice CRUD, kept in memory
     GET, PUT, DELETE  /practice/items/<id>
 
-This is not the real API. When it exists, stop this script and point API_URL
-at the real one.
+This is not the real API. When it runs for real, stop this script and point
+API_URL at the real one.
 """
 
 import json
@@ -22,10 +26,24 @@ from urllib.parse import parse_qs, urlparse
 
 HOST, PORT = "127.0.0.1", 8000
 RESULTS_FILE = Path(__file__).resolve().parent.parent / "results.mock.json"
-DEFAULT_VARIABLE = "Surface air temperature"
+MOCK_REGIONS = ["Example Region B", "Example Region C"]
+NO_DATA_REGION = "Example Region D (no data)"  # listed by /regions, always 404
 
 items = {1: {"id": 1, "text": "First practice item"}}
 next_id = 2
+
+
+def read_results():
+    with open(RESULTS_FILE, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def find_name(wanted, names):
+    """Case-insensitive match. Returns the canonical spelling, or None."""
+    for name in names:
+        if name.casefold() == wanted.casefold():
+            return name
+    return None
 
 
 def make_series(region, variable):
@@ -88,6 +106,36 @@ class Handler(BaseHTTPRequestHandler):
             return int(parts[2])
         return None
 
+    def handle_series(self, query):
+        region = query.get("region", [""])[0]
+        if not region:
+            self.send_json(
+                422,
+                {
+                    "detail": [
+                        {
+                            "type": "missing",
+                            "loc": ["query", "region"],
+                            "msg": "Field required",
+                        }
+                    ]
+                },
+            )
+            return
+        results = read_results()
+        default_region = results.get("region", "Example Region")
+        default_variable = results.get("variable", "Surface air temperature")
+        variable = query.get("variable", [""])[0] or default_variable
+        region_name = find_name(region, [default_region, *MOCK_REGIONS])
+        variable_name = find_name(variable, [default_variable])
+        if region_name is None or variable_name is None:
+            self.send_json(404, {"detail": f"No series for {region} / {variable}"})
+        elif region_name == default_region:
+            keys = ("region", "variable", "units", "period", "series")
+            self.send_json(200, {k: results[k] for k in keys if k in results})
+        else:
+            self.send_json(200, series_payload(region_name, variable_name))
+
     def do_OPTIONS(self):
         self.send_json(204)
 
@@ -96,16 +144,12 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/health":
             self.send_json(200, {"status": "ok"})
         elif url.path == "/results":
-            with open(RESULTS_FILE, encoding="utf-8") as f:
-                self.send_json(200, json.load(f))
+            self.send_json(200, read_results())
+        elif url.path == "/regions":
+            default_region = read_results().get("region", "Example Region")
+            self.send_json(200, [default_region, *MOCK_REGIONS, NO_DATA_REGION])
         elif url.path == "/series":
-            query = parse_qs(url.query)
-            region = query.get("region", [""])[0]
-            variable = query.get("variable", [""])[0] or DEFAULT_VARIABLE
-            if not region:
-                self.send_json(400, {"error": "use /series?region=..."})
-            else:
-                self.send_json(200, series_payload(region, variable))
+            self.handle_series(parse_qs(url.query))
         elif url.path == "/practice/items":
             self.send_json(200, list(items.values()))
         elif self.item_id() in items:
