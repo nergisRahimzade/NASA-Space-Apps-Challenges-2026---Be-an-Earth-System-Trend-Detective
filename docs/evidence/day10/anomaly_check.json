@@ -1,0 +1,86 @@
+{
+  "status": "anomaly_series_saved_and_loaded",
+  "source_filename": "timeseries.csv",
+  "source_sha256": "32c803f6178dd68bd0ef58785a3d912eea11c79dd1ad0e3e8d450d31b205f38a",
+  "output_filename": "anomaly.csv",
+  "output_sha256": "a11f6e750097b73d4496b1145f85f6e5d573fecee1faf57d974e64f404eb4855",
+  "row_count": 264,
+  "first_month": "2003-01",
+  "last_month": "2024-12",
+  "units": "degC",
+  "definition": "Value minus the baseline mean for the same calendar month",
+  "baseline": {
+    "start": "2003-01",
+    "end": "2024-12",
+    "minimum_samples_per_month": 2
+  },
+  "climatology": [
+    {
+      "month": 1,
+      "mean": 5.621774733975919,
+      "count": 22
+    },
+    {
+      "month": 2,
+      "mean": 7.62486552317936,
+      "count": 22
+    },
+    {
+      "month": 3,
+      "mean": 11.926077540508471,
+      "count": 22
+    },
+    {
+      "month": 4,
+      "mean": 16.70056066479447,
+      "count": 22
+    },
+    {
+      "month": 5,
+      "mean": 21.651780125973406,
+      "count": 22
+    },
+    {
+      "month": 6,
+      "mean": 27.259615346060073,
+      "count": 22
+    },
+    {
+      "month": 7,
+      "mean": 29.978808969157285,
+      "count": 22
+    },
+    {
+      "month": 8,
+      "mean": 29.058219195964213,
+      "count": 22
+    },
+    {
+      "month": 9,
+      "mean": 25.496910366840044,
+      "count": 22
+    },
+    {
+      "month": 10,
+      "mean": 18.31290454644803,
+      "count": 22
+    },
+    {
+      "month": 11,
+      "mean": 10.820484374600003,
+      "count": 22
+    },
+    {
+      "month": 12,
+      "mean": 5.667927017098348,
+      "count": 22
+    }
+  ],
+  "missing_values": [],
+  "min": -2.8280104472663936,
+  "max": 3.5566237661337965,
+  "max_abs_calendar_month_mean": 6.4594794160009106e-15,
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "plot_filename": "raw_vs_anomaly.png",
+  "backend_loader_check": "All dates and values matched"
+}

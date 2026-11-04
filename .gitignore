@@ -32,3 +32,4 @@ data/processed/
 !/data/processed/
 /data/processed/*
 !/data/processed/timeseries.csv
+!/data/processed/anomaly.csv
