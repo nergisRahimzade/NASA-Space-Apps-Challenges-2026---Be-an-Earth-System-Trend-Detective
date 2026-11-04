@@ -41,7 +41,15 @@ DEFAULT_UNITS = "°C"
 
 
 class PipelineError(Exception):
-    """Something the person running the pipeline needs to fix."""
+    """A problem with the inputs that stops the pipeline. Raised when:
+
+    - the series CSV does not exist and --stub was not given;
+    - the CSV is not in the date,value format (wrong columns, a bad date,
+      a bad number or a month listed twice);
+    - fewer than 24 months have values, or the trend test returns no p-value.
+
+    main() catches it, logs "pipeline failed: <the reason>" and exits with code 1.
+    """
 
 
 def write_stub_series(path: Path, start: str = "2003-01", months: int = 264) -> None:

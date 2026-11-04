@@ -61,10 +61,14 @@ def get_results() -> dict:
 
 
 def load_current_results() -> Results:
-    """Load the results file the settings point at, checked against the contract.
+    """Load the results file and check it against the contract.
 
-    Answers 404 if the file is missing and 500 if it is broken, with a message
-    that says what is wrong.
+    Which file: results_path() asks config.py. By default (USE_MOCK=true) it is
+    results.mock.json; with USE_MOCK=false it is results/results.json, written
+    by the pipeline (python -m earth_system_trend.run); RESULTS_PATH overrides both.
+
+    Answers 404 if the file is missing and 500 if it breaks the contract, with a
+    message that says what is wrong. /results, /series and /trend all use this.
     """
     path = results_path()
     if not path.exists():
@@ -105,6 +109,8 @@ def get_trend() -> dict:
 
     Same checks as /results: 404 if the file is missing, 500 if it breaks the contract.
     """
+    # `results` is the whole results file, read and checked by load_current_results()
+    # above (results.mock.json by default, results/results.json with USE_MOCK=false).
     results = load_current_results()
     return {
         "region": results.region,
