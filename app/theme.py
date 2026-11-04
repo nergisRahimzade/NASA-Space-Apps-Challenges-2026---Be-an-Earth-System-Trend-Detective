@@ -21,6 +21,14 @@ NEUTRAL = "#D9DEE7"
 MAP_LAND = "#1C2639"
 MAP_LINES = "#3A4A63"
 
+# Significance badges. Text always accompanies the color.
+BADGE_GREEN_BG = "#173D2B"
+BADGE_GREEN_TEXT = "#7FD6A4"
+BADGE_GREEN_BORDER = "#2A7A55"
+BADGE_GREY_BG = "#262E3D"
+BADGE_GREY_TEXT = "#A9B2C3"
+BADGE_GREY_BORDER = "#3A4558"
+
 # Fonts: system fonts, so nothing has to be downloaded.
 FONT_HEADING = 'Georgia, "Times New Roman", serif'
 FONT_BODY = '-apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'

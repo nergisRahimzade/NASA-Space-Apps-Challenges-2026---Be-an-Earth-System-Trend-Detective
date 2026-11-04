@@ -1,6 +1,13 @@
 ﻿import streamlit as st
 from charts import anomaly_available, chart_title, make_chart
-from components import empty_state, error_state, stat_card
+from components import (
+    empty_state,
+    error_state,
+    format_p,
+    format_signed,
+    is_significant,
+    stat_card,
+)
 from maps import make_map
 from mock_map import mock_points
 from theme import apply_theme
@@ -54,7 +61,7 @@ def to_view(r):
         "p": trend["p"],
         "tau": trend["tau"],
         "trend": trend["trend"],
-        "significant": trend["p"] < 0.05,
+        "significant": is_significant(trend["p"], trend["trend"]),
         "explanation": r["explanation"],
     }
 
@@ -114,37 +121,50 @@ if not is_default:
     )
 
 slope_col, trend_col, p_col = st.columns(3)
+significant = v["significant"]  # True, False, or None when there is no p-value
+trend_label = v["trend"] or "n/a"
 arrow = {"increasing": "▲", "decreasing": "▼"}.get(v["trend"], "–")
 
 with slope_col:
     units_note = v["units"]
-    if not v["significant"]:
+    if significant is False:
         units_note += " · not clearly different from zero"
     stat_card(
         "Slope (per month)",
-        f"{v['slope']:+.4f}",
+        format_signed(v["slope"], 4),
         units_note,
-        muted=not v["significant"],
+        muted=significant is False,
+        significant=significant,
     )
 
 with trend_col:
+    if significant is None:
+        trend_note = "Not enough data to test"
+    elif significant:
+        trend_note = "Statistically significant"
+    else:
+        trend_note = "No clear trend in this period"
     stat_card(
         "Trend",
-        f"{arrow} {v['trend'].capitalize()}",
-        "Statistically significant"
-        if v["significant"]
-        else "No clear trend in this period",
+        f"{arrow} {trend_label.capitalize()}",
+        trend_note,
+        significant=significant,
     )
 
 with p_col:
+    if significant is None:
+        p_note = "No p-value available"
+    elif significant:
+        p_note = "Below 0.05, so significant"
+    else:
+        p_note = "Not significant at 0.05"
     stat_card(
         "p-value",
-        f"{v['p']:.3f}",
-        "Below 0.05, so significant"
-        if v["significant"]
-        else "Above 0.05, so not significant",
+        format_p(v["p"]),
+        p_note,
+        significant=significant,
     )
-
+    
 chart_col, know_col = st.columns([2, 1])
 
 with chart_col.container(border=True):
@@ -198,7 +218,7 @@ with know_col.container(border=True):
     st.subheader("How we know")
     st.write("Data source: [dataset name]")
     st.write("Test: Mann-Kendall trend test")
-    st.markdown(f"Kendall's tau: **{v['tau']:+.2f}**")
+    st.markdown(f"Kendall's tau: **{format_signed(v['tau'], 2)}**")
     st.caption("Tau runs from -1 to +1. It shows how consistently values rise or fall.")
 
 with st.container(border=True):
