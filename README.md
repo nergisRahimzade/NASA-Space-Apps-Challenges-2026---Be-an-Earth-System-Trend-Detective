@@ -251,6 +251,17 @@ of the whole-window mean. See [subregion notes](docs/subregion_notes.md) for
 bounds, the overview plot and the inherited quality policy. API registration
 of the new regions is a later backend task.
 
+## Check per-cell feasibility (Day 12)
+
+```sh
+uv run --locked python -m earth_system_trend.chunk_check
+```
+
+This chunks the nighttime data with `time=-1, lat=50, lon=50`, verifies a
+centered 16-cell sample and times the existing trend function. The
+[decision](docs/chunking_decision.md) and [check record](docs/evidence/day12/chunk_check.json)
+record whether to try the optional per-cell map or retain the subregions.
+
 ## After pulling team changes
 
 From the repository root, run:
