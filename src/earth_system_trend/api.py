@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from .config import configure_logging, get_settings
 from .contract import ContractError, Results, load_results
 from .rate_limit import RateLimiter
+from .regions import RegionResults, load_region_files, matches, slugify
 
 configure_logging()
 
@@ -83,15 +84,53 @@ def _same(a: str, b: str) -> bool:
     return a.strip().casefold() == b.strip().casefold()
 
 
+def all_regions() -> list[RegionResults]:
+    """ESD-D12-BE. The whole study area first, then each sub-region file."""
+    main = load_current_results()
+    return [RegionResults(id=slugify(main.region), results=main),
+            *load_region_files(get_settings().regions_dir)]
+
+
+def find_region(region: str) -> Results:
+    """The results for one region, found by its id or label. 404 if there is none."""
+    for entry in all_regions():
+        if matches(entry, region):
+            return entry.results
+    raise HTTPException(status_code=404, detail=f"No data for region: {region}")
+
+
+@app.get("/regions")
+def get_regions() -> dict:
+    """ESD-D12-BE. Every region with data and its trend, for the dropdown and compare chart.
+
+    The whole study area comes first. Use a region's `id` (or its label) in
+    /series?region=... and /trend?region=...
+    """
+    return {
+        "regions": [
+            {
+                "id": entry.id,
+                "region": entry.results.region,
+                "variable": entry.results.variable,
+                "units": entry.results.units,
+                "period": entry.results.period.model_dump(),
+                "trend": entry.results.trend.model_dump(),
+            }
+            for entry in all_regions()
+        ]
+    }
+
+
 @app.get("/series")
 def get_series(region: str, variable: str | None = None) -> dict:
     """ESD-D08-BE. One monthly series, for the time-series chart.
 
-    Example: /series?region=Phoenix%20study%20area&variable=...
-    `variable` is optional. Answers 404 if there is no data for that choice.
+    Example: /series?region=phoenix_northwest&variable=...
+    `region` is a region's id or label (see /regions); `variable` is optional.
+    Answers 404 if there is no data for that choice.
     """
-    results = load_current_results()
-    if not _same(region, results.region) or (variable and not _same(variable, results.variable)):
+    results = find_region(region)
+    if variable and not _same(variable, results.variable):
         wanted = region if not variable else f"{region} / {variable}"
         raise HTTPException(status_code=404, detail=f"No series for {wanted}")
     return {
@@ -104,14 +143,16 @@ def get_series(region: str, variable: str | None = None) -> dict:
 
 
 @app.get("/trend")
-def get_trend() -> dict:
+def get_trend(region: str | None = None) -> dict:
     """ESD-D10-BE. The trend numbers and explanation, for the stat cards and AI box.
 
     Same checks as /results: 404 if the file is missing, 500 if it breaks the contract.
+    ESD-D12-BE: add ?region=<id or label> for a sub-region (see /regions).
     """
     # `results` is the whole results file, read and checked by load_current_results()
-    # above (results.mock.json by default, results/results.json with USE_MOCK=false).
-    results = load_current_results()
+    # above (results.mock.json by default, results/results.json with USE_MOCK=false),
+    # or one sub-region's file when ?region= is given.
+    results = find_region(region) if region else load_current_results()
     return {
         "region": results.region,
         "variable": results.variable,
