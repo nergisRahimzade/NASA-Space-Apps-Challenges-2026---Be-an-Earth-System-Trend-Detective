@@ -1,0 +1,14 @@
+{
+  "source_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "map_sha256": "f62b0b8aa618405bcb9e207cdc71e6cb96eb4ff03d5614431573bb0dc57fd7ee",
+  "method": "Direct pymannkendall.original_test on each original cell series; same backend rounding",
+  "checked_cells": 192,
+  "months_per_cell": 264,
+  "max_absolute_differences": {
+    "slope": 0.0,
+    "p": 0.0,
+    "tau": 0.0
+  },
+  "coordinate_check": "Both coordinate arrays match the source in original order",
+  "flag_check": "All directions, valid counts and status codes matched"
+}
