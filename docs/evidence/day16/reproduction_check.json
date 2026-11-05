@@ -1,0 +1,75 @@
+{
+  "status": "raw_snapshot_replay_passed",
+  "input_scope": "Existing downloaded raw files; no new download",
+  "manifest_sha256": "367f6bdc3654ff4e71050e3547c443f9dfea3dd6371b3b7238b0431e59284f40",
+  "verified_files": 264,
+  "source_bytes": 19435804595,
+  "preprocessing_commit": "5364599356de78c1dec1ec147bb9624b0c2f7718",
+  "preprocessing_file_sha256": {
+    "inspect_data.py": "3a348b08ec0c4fd81c32d9f678bcc19392fb5c8d67f6a05e7d3d6d6b1ee40fa2",
+    "combine_data.py": "48e17d2dc3be8d7bd6873eb85bfa64bf1be6326ef8a3091abe55ae05f1bd7c04",
+    "clean_data.py": "f45248174d8550e4f26d412b7c6f0886d0d38e6c838406809c33f08acf415eee"
+  },
+  "derived_processing_commit": "804b0af34dfaa93bd14402dbbd0a7389436f15c6",
+  "reproduction_script_sha256": "ff6d9e2ee961ebb80af2aa268f9f73c3418981e39d3fc1d2c7dd96465cae5e9f",
+  "derived_module_sha256": {
+    "aggregate.py": "85d2aaefc50224aaadcbf63260f096a250fdf8c83a69d7a50cbf9844fee372e2",
+    "anomaly.py": "fc8f5988b064db0adad4142664704b633b79fb614a6c04f095439d3dd1d9891d",
+    "subregions.py": "76289c1aba782e7a03f39d0c85da00305998f1f587a6f8d95c03a095d014ee54",
+    "trend_map.py": "e511938d94782c0c3c4242a70d342b376e8fc822181fb44f24ca07073f587189",
+    "trend.py": "3a7927c8a0a54e780a49b363a3b58f13899a4daa9dc1a13cd106728790ccd966"
+  },
+  "fresh_output_directory": "data/day16_replay",
+  "dimensions": {
+    "time": 264,
+    "lat": 12,
+    "lon": 16
+  },
+  "first_month": "2003-01",
+  "last_month": "2024-12",
+  "clean_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "clean_reference_check": "All 17 variables, coordinates, attributes, types and missing positions matched",
+  "csv_outputs": [
+    {
+      "filename": "timeseries.csv",
+      "rows": 264,
+      "sha256": "32c803f6178dd68bd0ef58785a3d912eea11c79dd1ad0e3e8d450d31b205f38a",
+      "comparison": "Byte-identical to tracked reference"
+    },
+    {
+      "filename": "anomaly.csv",
+      "rows": 264,
+      "sha256": "a11f6e750097b73d4496b1145f85f6e5d573fecee1faf57d974e64f404eb4855",
+      "comparison": "Byte-identical to tracked reference"
+    },
+    {
+      "filename": "timeseries_phoenix_northwest.csv",
+      "rows": 264,
+      "sha256": "621c547479c7f06346094f559d5964b8ff732191a687ba12881acebca2873f0c",
+      "comparison": "Byte-identical to tracked reference"
+    },
+    {
+      "filename": "timeseries_phoenix_northeast.csv",
+      "rows": 264,
+      "sha256": "ed2baed35d79c2b59daf644d4ac7350ec226f02c016aaabc8bf8d8e46169ff8b",
+      "comparison": "Byte-identical to tracked reference"
+    },
+    {
+      "filename": "timeseries_phoenix_southwest.csv",
+      "rows": 264,
+      "sha256": "7fdb04930438ae2df1e09eda5e671c0386e38b406320f70fc737419ad9e363e7",
+      "comparison": "Byte-identical to tracked reference"
+    },
+    {
+      "filename": "timeseries_phoenix_southeast.csv",
+      "rows": 264,
+      "sha256": "6baee5ce848eff92d2f21a330d0c1e24896314c1006fc73d42a32e6f0a77352f",
+      "comparison": "Byte-identical to tracked reference"
+    }
+  ],
+  "trend_map_sha256": "f62b0b8aa618405bcb9e207cdc71e6cb96eb4ff03d5614431573bb0dc57fd7ee",
+  "map_reference_check": "All six fields, coordinates, attributes, types and missing positions matched",
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "elapsed_seconds": 829.0437656249851,
+  "scientific_signoff": "Not established by this reproducibility check"
+}
