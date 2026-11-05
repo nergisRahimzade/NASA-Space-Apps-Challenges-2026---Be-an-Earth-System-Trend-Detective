@@ -1,0 +1,22 @@
+{
+  "study_region": "Phoenix study area",
+  "bounds_order": ["west", "south", "east", "north"],
+  "regions": {
+    "phoenix_northwest": {
+      "label": "Phoenix northwest window",
+      "bounds": [-112.4, 33.5, -112.0, 33.8]
+    },
+    "phoenix_northeast": {
+      "label": "Phoenix northeast window",
+      "bounds": [-112.0, 33.5, -111.6, 33.8]
+    },
+    "phoenix_southwest": {
+      "label": "Phoenix southwest window",
+      "bounds": [-112.4, 33.2, -112.0, 33.5]
+    },
+    "phoenix_southeast": {
+      "label": "Phoenix southeast window",
+      "bounds": [-112.0, 33.2, -111.6, 33.5]
+    }
+  }
+}

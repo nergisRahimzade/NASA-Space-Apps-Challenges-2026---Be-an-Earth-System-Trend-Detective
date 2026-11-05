@@ -1,0 +1,101 @@
+{
+  "status": "subregion_series_saved_and_loaded",
+  "source_filename": "clean.nc",
+  "source_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "definitions_sha256": "0f93520afb960df0c99ed38eae88ba539dd50a7d6cf434e6cfa4c8964401f5a6",
+  "variable": "lst_night",
+  "units": "degC",
+  "first_month": "2003-01",
+  "last_month": "2024-12",
+  "region_count": 4,
+  "source_dimensions": {
+    "time": 264,
+    "lat": 12,
+    "lon": 16
+  },
+  "regions": [
+    {
+      "id": "phoenix_northwest",
+      "label": "Phoenix northwest window",
+      "bounds": [
+        -112.4,
+        33.5,
+        -112.0,
+        33.8
+      ],
+      "filename": "timeseries_phoenix_northwest.csv",
+      "sha256": "621c547479c7f06346094f559d5964b8ff732191a687ba12881acebca2873f0c",
+      "cell_count": 48,
+      "shape": [
+        6,
+        8
+      ],
+      "row_count": 264,
+      "missing_values": []
+    },
+    {
+      "id": "phoenix_northeast",
+      "label": "Phoenix northeast window",
+      "bounds": [
+        -112.0,
+        33.5,
+        -111.6,
+        33.8
+      ],
+      "filename": "timeseries_phoenix_northeast.csv",
+      "sha256": "ed2baed35d79c2b59daf644d4ac7350ec226f02c016aaabc8bf8d8e46169ff8b",
+      "cell_count": 48,
+      "shape": [
+        6,
+        8
+      ],
+      "row_count": 264,
+      "missing_values": []
+    },
+    {
+      "id": "phoenix_southwest",
+      "label": "Phoenix southwest window",
+      "bounds": [
+        -112.4,
+        33.2,
+        -112.0,
+        33.5
+      ],
+      "filename": "timeseries_phoenix_southwest.csv",
+      "sha256": "7fdb04930438ae2df1e09eda5e671c0386e38b406320f70fc737419ad9e363e7",
+      "cell_count": 48,
+      "shape": [
+        6,
+        8
+      ],
+      "row_count": 264,
+      "missing_values": []
+    },
+    {
+      "id": "phoenix_southeast",
+      "label": "Phoenix southeast window",
+      "bounds": [
+        -112.0,
+        33.2,
+        -111.6,
+        33.5
+      ],
+      "filename": "timeseries_phoenix_southeast.csv",
+      "sha256": "6baee5ce848eff92d2f21a330d0c1e24896314c1006fc73d42a32e6f0a77352f",
+      "cell_count": 48,
+      "shape": [
+        6,
+        8
+      ],
+      "row_count": 264,
+      "missing_values": []
+    }
+  ],
+  "selection": "Cell centers: west <= lon < east; south <= lat < north",
+  "weighting": "cos(deg2rad(lat)); weighted mean over lat and lon; skip NaN",
+  "partition": "All 192 source cells assigned exactly once",
+  "max_parent_reconstruction_error": 1.7763568394002505e-14,
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "plot_filename": "subregions.png",
+  "backend_loader_check": "All region dates and values matched"
+}
