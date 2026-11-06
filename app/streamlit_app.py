@@ -1,12 +1,4 @@
 ﻿import streamlit as st
-from api_client import (
-    API_URL,
-    NoSeriesError,
-    load_choices,
-    load_region_trends,
-    load_results,
-    load_series,
-)
 from charts import anomaly_available, chart_title, make_chart, make_region_comparison
 from components import (
     empty_state,
@@ -19,6 +11,15 @@ from components import (
 from maps import make_map
 from mock_map import mock_points
 from theme import apply_theme
+
+from api_client import (
+    API_URL,
+    NoSeriesError,
+    load_choices,
+    load_region_trends,
+    load_results,
+    load_series,
+)
 
 st.set_page_config(
     page_title="Earth System Trend Detective",
