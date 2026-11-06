@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 # already set (for example on the live server) are never overwritten.
 load_dotenv()
 
+DEFAULT_MAP_PATH = "trend_map.mock.json"  # fake per-cell trends (ESD-D13-BE)
+REAL_MAP_PATH = "results/trend_map.json"  # what the Data layer's trend map step writes
 DEFAULT_RESULTS_PATH = "results.mock.json"  # the fake results everyone builds against
 REAL_RESULTS_PATH = "results/results.json"  # what the pipeline writes
 DEFAULT_SERIES_CSV = "data/processed/timeseries.csv"  # the Data layer's monthly series
@@ -41,6 +43,7 @@ class Settings:
     series_csv_path: Path
     regions_dir: Path | None
     regions_file: Path
+    map_path: Path
     openai_api_key: str | None
     openai_model: str
     openai_timeout_s: float
@@ -66,6 +69,8 @@ def get_settings() -> Settings:
         # Sub-regions are real data only, so mock mode has none unless REGIONS_DIR says so.
         regions_dir=_regions_dir(use_mock),
         regions_file=Path(os.getenv("REGIONS_FILE", DEFAULT_REGIONS_FILE)),
+        # MAP_PATH, if set, always wins; otherwise USE_MOCK picks the file (ESD-D13-BE).
+        map_path=Path(os.getenv("MAP_PATH") or (DEFAULT_MAP_PATH if use_mock else REAL_MAP_PATH)),
         openai_api_key=os.getenv("OPENAI_API_KEY") or None,
         openai_model=os.getenv("OPENAI_MODEL") or DEFAULT_MODEL,
         openai_timeout_s=_env_float("OPENAI_TIMEOUT_S", DEFAULT_TIMEOUT_S),

@@ -2,15 +2,16 @@
 
 Run it with:  uv run --locked uvicorn earth_system_trend.api:app --reload
 """
-
+import math
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import configure_logging, get_settings
-from .contract import ContractError, Results, load_results
+from .contract import ContractError, MapPoint, Results, load_map, load_results
 from .rate_limit import RateLimiter
 from .regions import RegionResults, load_region_files, matches, slugify
 
@@ -26,6 +27,10 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+# ESD-D13-BE. Compress any answer bigger than 1 kB when the browser accepts gzip
+# (every browser and the requests library do). JSON shrinks to a fraction of
+# its size, so the map and the 264-month series load faster.
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # ESD-D07-BE. A simple rate limit: each visitor gets a fixed number of
 # requests per minute. /health is exempt so uptime checks never get blocked.
@@ -161,3 +166,54 @@ def get_trend(region: str | None = None) -> dict:
         "trend": results.trend.model_dump(),
         "explanation": results.explanation,
     }
+# --- ESD-D13-BE: the trend map ------------------------------------------------
+MAX_MAP_POINTS = 5000  # the most cells /map ever sends; keeps the page fast
+
+
+def thin_points(points: list[MapPoint], max_points: int) -> tuple[list[MapPoint], int]:
+    """Keep at most max_points cells, spread evenly over the grid.
+
+    Returns (kept points, step). With step k, every k-th row and every k-th
+    column of the grid is kept, so the map still covers the whole area, just
+    with bigger cells. step is 1 when nothing had to be dropped.
+    """
+    if len(points) <= max_points:
+        return points, 1
+    lats = {lat: i for i, lat in enumerate(sorted({p.lat for p in points}))}
+    lons = {lon: i for i, lon in enumerate(sorted({p.lon for p in points}))}
+    step = math.ceil(math.sqrt(len(points) / max_points))
+    while True:
+        kept = [p for p in points if lats[p.lat] % step == 0 and lons[p.lon] % step == 0]
+        if len(kept) <= max_points:
+            return kept, step
+        step += 1  # an irregular grid can need a bigger step
+
+
+@app.get("/map")
+def get_map(
+    max_points: int = Query(MAX_MAP_POINTS, ge=1, le=MAX_MAP_POINTS,
+                            description="Most cells to return (1 to 5000)"),
+) -> dict:
+    """ESD-D13-BE. Per-cell trends for the trend map.
+
+    Reads trend_map.mock.json by default, results/trend_map.json with
+    USE_MOCK=false, or MAP_PATH. Answers 404 if the file is missing and 500 if
+    it breaks the map contract (docs/contract.md). Large grids are thinned to
+    max_points cells; `resolution_deg` then grows to match, so the cells still
+    tile the area.
+    """
+    path = get_settings().map_path
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"Map file not found: {path}")
+    try:
+        trend_map = load_map(path)
+    except ContractError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    points, step = thin_points(trend_map.points, max_points)
+    body = trend_map.model_dump()
+    body["resolution_deg"] = round(trend_map.resolution_deg * step, 6)
+    body["points"] = [point.model_dump() for point in points]
+    body["point_count"] = len(points)
+    body["original_point_count"] = len(trend_map.points)
+    return body
