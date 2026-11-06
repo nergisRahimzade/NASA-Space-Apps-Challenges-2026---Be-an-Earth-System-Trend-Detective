@@ -1,5 +1,13 @@
 ﻿import streamlit as st
-from charts import anomaly_available, chart_title, make_chart
+from api_client import (
+    API_URL,
+    NoSeriesError,
+    load_choices,
+    load_region_trends,
+    load_results,
+    load_series,
+)
+from charts import anomaly_available, chart_title, make_chart, make_region_comparison
 from components import (
     empty_state,
     error_state,
@@ -12,21 +20,12 @@ from maps import make_map
 from mock_map import mock_points
 from theme import apply_theme
 
-from api_client import (
-    API_URL,
-    NoSeriesError,
-    load_choices,
-    load_results,
-    load_series,
-)
-
 st.set_page_config(
     page_title="Earth System Trend Detective",
     page_icon="🛰️",
     layout="wide",
 )
 apply_theme()
-
 
 @st.cache_data(ttl=60)
 def get_results():
@@ -42,6 +41,9 @@ def get_choices(default_region, default_variable):
 def get_series(region, variable, default_units):
     return load_series(region, variable, default_units)
 
+@st.cache_data(ttl=60)
+def get_region_trends():
+    return load_region_trends()
 
 # The only place that knows the contract's key names.
 # If results.mock.json changes, update the keys here and nowhere else.
@@ -240,6 +242,26 @@ with st.container(border=True):
             "No locations to map yet.",
             "Per-location trends have not been provided.",
         )
+
+with st.container(border=True):
+    st.subheader("Compare regions")
+    regions = get_region_trends()
+    if regions:
+        st.plotly_chart(
+            make_region_comparison(regions, v["units"], selected=region),
+            theme=None,
+        )
+        st.caption(
+            "Gold bars are statistically significant at 0.05. Grey bars are not. "
+            "The outlined bar is the region you picked above."
+        )
+    elif regions is None:
+        error_state(
+            "Could not load region trends.",
+            "The regions endpoint did not respond. Check API_URL and try again.",
+        )
+    else:
+        empty_state("No regions to compare yet.", "The API returned no trends.")
 
 with st.container(border=True):
     st.subheader("AI explanation")
