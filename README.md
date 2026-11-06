@@ -238,6 +238,22 @@ The baseline means, counts and original-versus-anomaly plot are under
 `docs/evidence/day10/`. See [anomaly notes](docs/anomaly_notes.md) for the
 baseline definition and inherited quality policy.
 
+## Build the subregion series (Day 11)
+
+```sh
+uv run --locked python -m earth_system_trend.subregions
+```
+
+This reads `data/processed/clean.nc` and the four boxes in `docs/subregions.json`,
+then writes `timeseries_phoenix_northwest.csv`, `timeseries_phoenix_northeast.csv`,
+`timeseries_phoenix_southwest.csv` and `timeseries_phoenix_southeast.csv` under
+`data/processed/`. Each contains 264 `date,value` rows in °C.
+
+The command checks coverage, overlapping cells, CSV readback and reconstruction
+of the whole-window mean. See [subregion notes](docs/subregion_notes.md) for
+bounds, the overview plot and the inherited quality policy. API registration
+of the new regions is a later backend task.
+
 ## After pulling team changes
 
 From the repository root, run:

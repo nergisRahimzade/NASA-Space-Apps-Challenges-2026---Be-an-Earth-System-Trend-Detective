@@ -33,3 +33,7 @@ data/processed/
 /data/processed/*
 !/data/processed/timeseries.csv
 !/data/processed/anomaly.csv
+!/data/processed/timeseries_phoenix_northwest.csv
+!/data/processed/timeseries_phoenix_northeast.csv
+!/data/processed/timeseries_phoenix_southwest.csv
+!/data/processed/timeseries_phoenix_southeast.csv

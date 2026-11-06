@@ -84,7 +84,12 @@ except (KeyError, TypeError) as exc:
     st.stop()
 
 st.title("Earth System Trend Detective")
-
+if source.startswith("local"):
+    st.warning(
+        "Showing the local mock file, not the API. "
+        f"({source}) Start the server to see real data."
+    )
+    
 region_choices, variable_choices = get_choices(v["region"], v["variable"])
 col_period, col_region, col_variable = st.columns(3)
 col_period.selectbox("Period", [f"{v['start']} to {v['end']}"])
@@ -243,7 +248,7 @@ with st.container(border=True):
     else:
         empty_state("No explanation yet.", "It appears once the AI step has run.")
 
-footer = f"Showing results from: {source}"
+footer = f"Showing results from: {source} · {len(v['dates'])} monthly values"
 if not is_default and not failed:
     footer += f" · series from API at {API_URL}"
 st.caption(footer)
