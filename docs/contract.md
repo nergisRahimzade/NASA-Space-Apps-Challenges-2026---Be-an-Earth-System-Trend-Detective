@@ -46,6 +46,16 @@ until real data replaces it (USE_MOCK=false).
 
 - `/series?region=` and `/trend?region=` take a region's `id` or label, ignoring upper/lowercase. A region with no file returns 404.
 
+## API answers (checked end to end)
+
+The exact shape of every endpoint's answer is a pydantic model in
+`src/earth_system_trend/contract.py`: `Health`, `Results` (`/results`),
+`RegionsResponse` (`/regions`), `SeriesResponse` (`/series`) and
+`TrendResponse` (`/trend`). Unknown fields are rejected.
+`python -m earth_system_trend.e2e` runs the pipeline, asks the API every
+endpoint and validates each answer against these models (ESD-D14-BE).
+
 ## Changelog
 - v0.1: initial draft
 - v1.1: per-region results files in `results/regions/` and the `/regions` list (ESD-D12-BE). The results file shape itself is unchanged.
+- v1.1 (unchanged shape, release v0.2): added response models for every endpoint and the end-to-end test that checks them (ESD-D14-BE).
