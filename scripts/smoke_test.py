@@ -19,6 +19,7 @@ CHECKS = [
     # (path, what the JSON answer must contain)
     ("/health", ["status"]),
     ("/results", ["region", "series", "trend"]),
+    ("/map", ["points", "resolution_deg"]),
 ]
 
 

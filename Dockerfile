@@ -18,7 +18,7 @@ RUN uv sync --locked --no-dev --no-install-project
 
 # 4. Copy our code and the mock results, then install the project itself.
 COPY src ./src
-COPY results.mock.json ./
+COPY results.mock.json trend_map.mock.json ./
 COPY results ./results
 RUN uv sync --locked --no-dev
 

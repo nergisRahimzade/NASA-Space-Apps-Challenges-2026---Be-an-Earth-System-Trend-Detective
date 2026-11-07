@@ -1,4 +1,4 @@
-# Results Contract (v1.1)
+# Results Contract (v1.2
 
 The agreed shape of `results.json`. Everyone builds against `results.mock.json`
 until real data replaces it (USE_MOCK=false).
@@ -46,6 +46,27 @@ until real data replaces it (USE_MOCK=false).
 
 - `/series?region=` and `/trend?region=` take a region's `id` or label, ignoring upper/lowercase. A region with no file returns 404.
 
+- v1.2: trend map file and GET /map (ESD-D13-BE). Other files unchanged.
+## Trend map (v1.2)
+
+Per-cell trends for the map live in their own file, so `results.json` does not change.
+
+- Mock: `trend_map.mock.json` (made-up numbers on the Phoenix grid; rebuild with `scripts/make_mock_map.py`).
+- Real: `results/trend_map.json`, written by the Data layer's trend map step (ESD-D13-DAT). `MAP_PATH` overrides both.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| region, variable, units, period | as above | Describe the whole map |
+| test | string | Trend test run on each cell |
+| resolution_deg | number | Grid spacing in degrees; each point is a cell center |
+| points[] | list | One entry per grid cell |
+| points[].lat / lon | number | Cell center, degrees |
+| points[].slope | number or null | Change per month, in `units` |
+| points[].p, tau, trend | as in `trend` | Same meaning as the area trend |
+
+A cell with fewer than 24 months of values has `slope`, `p`, `tau` and `trend` all null. They are either all set or all null.
+
+`GET /map` returns this file plus `point_count` and `original_point_count`. It never sends more than 5,000 cells (`?max_points=` lowers that): a bigger grid is thinned to every k-th row and column, and `resolution_deg` is multiplied by k so the cells still tile the area. Answers over 1 kB are gzip-compressed for clients that accept it.
 ## Changelog
 - v0.1: initial draft
 - v1.1: per-region results files in `results/regions/` and the `/regions` list (ESD-D12-BE). The results file shape itself is unchanged.
