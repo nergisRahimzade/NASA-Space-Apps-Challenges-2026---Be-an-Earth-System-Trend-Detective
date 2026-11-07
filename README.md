@@ -283,6 +283,11 @@ two published LST studies, explains differences in measurement and methods,
 and records the original-versus-anomaly significance check. Full-precision
 numbers and source hashes are in the [check record](docs/evidence/day14/validation_check.json).
 
+## Second-variable decision (Day 15)
+
+The [Day 15 decision](docs/second_variable_decision.md) records a skip while
+the primary analysis awaits team review, as permitted by the sprint plan.
+
 ## After pulling team changes
 
 From the repository root, run:
