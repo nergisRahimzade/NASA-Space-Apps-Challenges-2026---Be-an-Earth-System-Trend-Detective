@@ -83,6 +83,7 @@ Run this from the project root so the API can find `results.mock.json`. Then ope
 - `http://localhost:8000/results` returns the contents of `results.mock.json` (see `docs/contract.md`).
 - `http://localhost:8000/series?region=Example%20Region` returns one monthly series (region, variable, units, period and the monthly values) for the chart. An optional `&variable=...` narrows it. A region or variable with no data returns 404.
 - `http://localhost:8000/trend` returns just the trend numbers (slope, p-value, tau, direction) and the explanation, for the stat cards.
+- `http://localhost:8000/regions` lists every region with data and its trend: the whole study area first, then each sub-region. Use a region's `id` in `/series?region=...` and `/trend?region=...`.
 - `http://localhost:8000/docs` lists every endpoint and lets you try them.
 
 `/results`, `/series` and `/trend` check the results file against `docs/contract.md` first. A missing file returns 404; a file that breaks the contract returns 500 with a message naming the bad field.
@@ -122,6 +123,8 @@ The pipeline reads the Data layer's monthly CSV (`data/processed/timeseries.csv`
 ```text
 uv run --locked python -m earth_system_trend.run
 ```
+
+To build one results file per sub-region instead, run it with `--all-regions`. It reads the sub-region list in `docs/subregions.json` and each `data/processed/timeseries_<id>.csv`, and writes `results/regions/<id>.json`, which `/regions` serves when `USE_MOCK=false`.
 
 Before real data exists, add `--stub` to write a fake CSV first and try the whole chain. The command skips the work if `results/results.json` is already newer than the CSV; add `--force` to rebuild. To serve the new file, set `USE_MOCK=false` (step 7) and restart the API.
 
