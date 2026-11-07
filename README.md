@@ -265,6 +265,17 @@ centered 16-cell sample and times the existing trend function. The
 [decision](docs/chunking_decision.md) and [check record](docs/evidence/day12/chunk_check.json)
 record whether to try the optional per-cell map or retain the subregions.
 
+## Build the optional trend map (Day 13)
+
+```sh
+uv run --locked python -m earth_system_trend.trend_map
+```
+
+This tests a 4×4 sample, then the 192-cell Phoenix window using
+`xr.apply_ufunc(vectorize=True)`. If both runs fit the local 30-second budget,
+it saves `data/processed/trend_map.nc` and a [preview](docs/evidence/day13/trend_map.png).
+See [map notes](docs/trend_map_notes.md) for fields, timings and preliminary status.
+
 ## After pulling team changes
 
 From the repository root, run:

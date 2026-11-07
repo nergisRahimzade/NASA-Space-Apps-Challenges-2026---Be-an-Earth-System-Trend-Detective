@@ -37,3 +37,4 @@ data/processed/
 !/data/processed/timeseries_phoenix_northeast.csv
 !/data/processed/timeseries_phoenix_southwest.csv
 !/data/processed/timeseries_phoenix_southeast.csv
+!/data/processed/trend_map.nc
