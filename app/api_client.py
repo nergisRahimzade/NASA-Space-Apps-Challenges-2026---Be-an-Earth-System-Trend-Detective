@@ -122,11 +122,12 @@ def load_results():
         response = requests.get(f"{API_URL}/results", timeout=3)
         response.raise_for_status()
         return response.json(), f"API at {API_URL}"
-    except requests.RequestException:
+    except requests.RequestException as exc:
         with open(MOCK_FILE, encoding="utf-8") as f:
-            return json.load(f), "local results.mock.json"
-
-
+            reason = type(exc).__name__
+            source = f"local results.mock.json (API at {API_URL} not used: {reason})"
+            return json.load(f), source
+        
 def load_series(region, variable, default_units="[unit]"):
     """Fetch one series and return it in the shape the chart expects.
 

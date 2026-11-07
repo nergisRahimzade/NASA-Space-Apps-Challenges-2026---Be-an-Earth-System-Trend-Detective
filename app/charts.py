@@ -87,7 +87,7 @@ def make_chart(v, mode="raw"):
         go.Scatter(
             x=dates,
             y=values,
-            mode="lines+markers",
+            mode="lines+markers" if len(dates) <= 36 else "lines",
             name=series_name,
             line={"color": NEUTRAL},
             hovertemplate="%{x|%b %Y}<br>"

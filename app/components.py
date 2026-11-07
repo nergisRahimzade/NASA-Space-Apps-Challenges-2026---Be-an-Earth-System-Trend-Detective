@@ -27,9 +27,16 @@ def is_significant(p, trend_label=None):
 
 
 def format_signed(value, digits):
-    """+0.0420 style number, or n/a when the value is missing."""
-    return "n/a" if value is None else f"{value:+.{digits}f}"
+    """+0.0420 style number, or n/a when the value is missing.
 
+    A tiny non-zero value would show as +0.0000, so with 3 or more decimals
+    it switches to scientific notation (+4.2e-05) instead.
+    """
+    if value is None:
+        return "n/a"
+    if digits >= 3 and value != 0 and abs(value) < 0.5 * 10 ** (-digits):
+        return f"{value:+.1e}"
+    return f"{value:+.{digits}f}"
 
 def format_p(p):
     """p-value with 3 decimals, <0.001 for tiny values, n/a when missing."""
