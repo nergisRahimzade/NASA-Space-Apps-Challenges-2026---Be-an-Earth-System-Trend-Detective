@@ -1,0 +1,63 @@
+{
+  "source_filename": "clean.nc",
+  "source_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "budget_seconds": 30.0,
+  "scheduler": "single-threaded",
+  "method": "xr.apply_ufunc(vectorize=True, dask='parallelized'); existing run_trend on original monthly values",
+  "sample_seconds": 0.07087466702796519,
+  "sample_dimensions": {
+    "lat": 4,
+    "lon": 4
+  },
+  "sample_index_slices": {
+    "lat": [
+      4,
+      8
+    ],
+    "lon": [
+      6,
+      10
+    ]
+  },
+  "full_window_seconds": 0.6491817079950124,
+  "source_dimensions": {
+    "time": 264,
+    "lat": 12,
+    "lon": 16
+  },
+  "cell_count": 192,
+  "sample_full_window_check": "All six fields matched",
+  "status": "trend_map_saved_and_loaded",
+  "decision": "Keep the optional Phoenix per-cell map.",
+  "output_filename": "trend_map.nc",
+  "output_sha256": "f62b0b8aa618405bcb9e207cdc71e6cb96eb4ff03d5614431573bb0dc57fd7ee",
+  "output_bytes": 33005,
+  "fields": [
+    "slope",
+    "p",
+    "tau",
+    "direction",
+    "n_valid",
+    "status"
+  ],
+  "dimensions": {
+    "lat": 12,
+    "lon": 16
+  },
+  "first_month": "2003-01",
+  "last_month": "2024-12",
+  "computed_cells": 192,
+  "status_counts": {
+    "0": 192,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "min_slope": 0.0042,
+  "max_slope": 0.0159,
+  "slope_units": "degC month-1",
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "review_status": "Preliminary; production QC and scientific method review pending",
+  "plot_filename": "trend_map.png",
+  "netcdf_readback": "All values, coordinates, flags and attributes matched"
+}
