@@ -1,0 +1,79 @@
+{
+  "status": "chunking_and_small_box_trial_complete",
+  "source_filename": "clean.nc",
+  "source_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "variable": "lst_night",
+  "units": "degC",
+  "first_month": "2003-01",
+  "last_month": "2024-12",
+  "source_dimensions": {
+    "time": 264,
+    "lat": 12,
+    "lon": 16
+  },
+  "requested_chunks": {
+    "time": -1,
+    "lat": 50,
+    "lon": 50
+  },
+  "actual_chunks": {
+    "time": [
+      264
+    ],
+    "lat": [
+      12
+    ],
+    "lon": [
+      16
+    ]
+  },
+  "nighttime_array_bytes": 405504,
+  "scheduler": "single-threaded",
+  "method": "Existing earth_system_trend.trend.run_trend on original monthly cell values; timing only",
+  "direct_read_check": "All sample values and missing positions matched",
+  "estimate": "Observed sample load seconds + sample trend seconds / tested cells * full-window cells",
+  "sample": {
+    "lat_slice": [
+      4,
+      8
+    ],
+    "lon_slice": [
+      6,
+      10
+    ],
+    "cell_count": 16,
+    "months_per_cell": 264,
+    "latitude_centers": [
+      33.574999999999996,
+      33.525,
+      33.474999999999994,
+      33.425
+    ],
+    "longitude_centers": [
+      -112.075,
+      -112.02499999999999,
+      -111.975,
+      -111.925
+    ]
+  },
+  "load_seconds": 0.017243292008060962,
+  "trend_seconds": 0.25378299999283627,
+  "tested_cells": 16,
+  "incomplete_cells": 0,
+  "failed_cells": 0,
+  "full_window_cells": 192,
+  "estimated_full_window_seconds": 3.062639291922096,
+  "budget_seconds": 30.0,
+  "decision": "optional_per_cell_trial",
+  "decision_reason": "The serial full-window estimate fits the local time budget.",
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "limitations": "Local serial estimate, not a full-window benchmark or scientific method validation.",
+  "runtime": {
+    "python": "3.12.15",
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "dask": "2026.8.0",
+    "xarray": "2026.9.0",
+    "pymannkendall": "1.4.3"
+  }
+}
