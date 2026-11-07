@@ -18,6 +18,8 @@ MOCK_FILE = Path(__file__).resolve().parent.parent / "results.mock.json"
 #     Dates are "YYYY-MM". A value may be null (missing month).
 #   GET /regions  returns the region list (real list from Day 12). Its exact
 #     shape is NOT confirmed yet, so parse_regions() accepts a few shapes.
+#   GET /regions per-region trends (slope, p, trend) for the Day 12 chart.
+#     Shape also NOT confirmed yet; see load_region_trends().
 # If any of this changes, edit this section, parse_series() and parse_regions().
 # ---------------------------------------------------------------------------
 SERIES_PATH = "/series"
@@ -66,6 +68,34 @@ def load_regions():
     except (requests.RequestException, ValueError):
         return None
     return names or None
+
+
+def load_region_trends():
+    """Per-region slope and p-value, or None if the endpoint is unavailable.
+
+    The API nests the trend numbers under a "trend" object for each region.
+    """
+    try:
+        response = requests.get(f"{API_URL}{REGIONS_PATH}", timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        items = data.get("regions", []) if isinstance(data, dict) else data
+        rows = []
+        for item in items:
+            t = item.get("trend") or {}
+            if t.get("slope") is None:
+                continue
+            rows.append(
+                {
+                    "name": item.get("name") or item.get("region"),
+                    "slope": t["slope"],
+                    "p": t.get("p"),
+                    "trend": t.get("trend"),
+                }
+            )
+        return rows
+    except (requests.RequestException, ValueError, KeyError, TypeError, AttributeError):
+        return None
 
 
 def load_choices(default_region, default_variable):
@@ -122,9 +152,11 @@ def load_results():
         response = requests.get(f"{API_URL}/results", timeout=3)
         response.raise_for_status()
         return response.json(), f"API at {API_URL}"
-    except requests.RequestException:
+    except requests.RequestException as exc:
         with open(MOCK_FILE, encoding="utf-8") as f:
-            return json.load(f), "local results.mock.json"
+            reason = type(exc).__name__
+            source = f"local results.mock.json (API at {API_URL} not used: {reason})"
+            return json.load(f), source
 
 
 def load_series(region, variable, default_units="[unit]"):
