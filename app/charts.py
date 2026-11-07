@@ -2,7 +2,8 @@ from datetime import datetime
 from statistics import median
 
 import plotly.graph_objects as go
-from theme import ACCENT, BORDER, MUTED, NEUTRAL, style_figure
+from components import is_significant
+from theme import ACCENT, BORDER, MUTED, NEUTRAL, TEXT, style_figure
 
 # The trend line in the anomaly view stays hidden until the team confirms which
 # series (raw or anomaly) the slope in the results is computed on.
@@ -87,7 +88,7 @@ def make_chart(v, mode="raw"):
         go.Scatter(
             x=dates,
             y=values,
-            mode="lines+markers",
+            mode="lines+markers" if len(dates) <= 36 else "lines",
             name=series_name,
             line={"color": NEUTRAL},
             hovertemplate="%{x|%b %Y}<br>"
@@ -128,4 +129,45 @@ def make_chart(v, mode="raw"):
         zerolinecolor=BORDER,
     )
     fig.update_layout(legend={"orientation": "h", "y": 1.12, "x": 0})
+    return fig
+
+
+
+def make_region_comparison(regions, units, selected=None):
+    """Bar chart of slope per region. Significant bars are gold, the rest grey.
+
+    regions: list of {"name", "slope", "p", "trend"} dicts.
+    selected: the region name to outline, or None.
+    """
+    names = [r["name"] for r in regions]
+    slopes = [r["slope"] for r in regions]
+    sig = [is_significant(r["p"], r.get("trend")) for r in regions]
+    colors = [ACCENT if s else MUTED for s in sig]
+    labels = [
+        "Significant" if s else "Not significant" if s is False else "No p-value"
+        for s in sig
+    ]
+    outline = [3 if n == selected else 0 for n in names]
+
+    fig = go.Figure(
+        go.Bar(
+            x=names,
+            y=slopes,
+            marker={
+                "color": colors,
+                "line": {"width": outline, "color": TEXT},
+            },
+            customdata=labels,
+            hovertemplate="%{x}<br>Slope: %{y:+.4f} " + units
+            + " per month<br>%{customdata}<extra></extra>",
+        )
+    )
+    fig.add_hline(y=0, line_width=1, line_color=MUTED)
+    style_figure(fig, 340)
+    fig.update_xaxes(title_text="Region", gridcolor=BORDER, linecolor=BORDER)
+    fig.update_yaxes(
+        title_text=f"Slope ({units} per month)",
+        gridcolor=BORDER,
+        linecolor=BORDER,
+    )
     return fig

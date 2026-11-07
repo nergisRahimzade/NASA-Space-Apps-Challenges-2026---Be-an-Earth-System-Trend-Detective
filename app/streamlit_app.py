@@ -1,5 +1,5 @@
 ﻿import streamlit as st
-from charts import anomaly_available, chart_title, make_chart
+from charts import anomaly_available, chart_title, make_chart, make_region_comparison
 from components import (
     empty_state,
     error_state,
@@ -16,6 +16,8 @@ from api_client import (
     API_URL,
     NoSeriesError,
     load_choices,
+    load_map,
+    load_region_trends,
     load_results,
     load_series,
 )
@@ -26,7 +28,6 @@ st.set_page_config(
     layout="wide",
 )
 apply_theme()
-
 
 @st.cache_data(ttl=60)
 def get_results():
@@ -42,6 +43,14 @@ def get_choices(default_region, default_variable):
 def get_series(region, variable, default_units):
     return load_series(region, variable, default_units)
 
+@st.cache_data(ttl=60)
+def get_region_trends():
+    return load_region_trends()
+
+
+@st.cache_data(ttl=60)
+def get_map_points():
+    return load_map()
 
 # The only place that knows the contract's key names.
 # If results.mock.json changes, update the keys here and nowhere else.
@@ -84,7 +93,12 @@ except (KeyError, TypeError) as exc:
     st.stop()
 
 st.title("Earth System Trend Detective")
-
+if source.startswith("local"):
+    st.warning(
+        "Showing the local mock file, not the API. "
+        f"({source}) Start the server to see real data."
+    )
+    
 region_choices, variable_choices = get_choices(v["region"], v["variable"])
 col_period, col_region, col_variable = st.columns(3)
 col_period.selectbox("Period", [f"{v['start']} to {v['end']}"])
@@ -223,18 +237,47 @@ with know_col.container(border=True):
 
 with st.container(border=True):
     st.subheader("Trend map")
-    points = mock_points()
-    if points:
-        st.plotly_chart(make_map(points, v["units"]), theme=None)
-        st.caption(
-            "Placeholder locations: the contract has no per-location trends yet, "
-            "so these points are made up for layout only."
-        )
+    map_points = get_map_points()
+    using_placeholder = map_points is None  # None = /map unavailable
+    if using_placeholder:
+        map_points = mock_points()
+    if map_points:
+        st.plotly_chart(make_map(map_points, v["units"]), theme=None)
+        if using_placeholder:
+            st.caption(
+                "Placeholder locations: the /map endpoint is not available, so "
+                "these points are made up for layout only."
+            )
+        else:
+            st.caption(
+                "Each dot is one grid cell. Red means warming, blue means "
+                "cooling. Hover a dot to see its slope."
+            )
     else:
         empty_state(
             "No locations to map yet.",
-            "Per-location trends have not been provided.",
+            "The API returned no per-location trends.",
         )
+
+with st.container(border=True):
+    st.subheader("Compare regions")
+    regions = get_region_trends()
+    if regions:
+        st.plotly_chart(
+            make_region_comparison(regions, v["units"], selected=region),
+            theme=None,
+        )
+        st.caption(
+            "Gold bars are statistically significant at 0.05. Grey bars are not. "
+            "The outlined bar is the region you picked above."
+        )
+    elif regions is None:
+        error_state(
+            "Could not load region trends.",
+            "The regions endpoint did not respond. Check API_URL and try again.",
+        )
+    else:
+        empty_state("No regions to compare yet.", "The API returned no trends.")
 
 with st.container(border=True):
     st.subheader("AI explanation")
@@ -243,7 +286,7 @@ with st.container(border=True):
     else:
         empty_state("No explanation yet.", "It appears once the AI step has run.")
 
-footer = f"Showing results from: {source}"
+footer = f"Showing results from: {source} · {len(v['dates'])} monthly values"
 if not is_default and not failed:
     footer += f" · series from API at {API_URL}"
 st.caption(footer)

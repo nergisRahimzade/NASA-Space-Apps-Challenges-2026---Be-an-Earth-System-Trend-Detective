@@ -22,6 +22,8 @@ load_dotenv()
 DEFAULT_RESULTS_PATH = "results.mock.json"  # the fake results everyone builds against
 REAL_RESULTS_PATH = "results/results.json"  # what the pipeline writes
 DEFAULT_SERIES_CSV = "data/processed/timeseries.csv"  # the Data layer's monthly series
+REAL_REGIONS_DIR = "results/regions"  # one results file per sub-region (ESD-D12-BE)
+DEFAULT_REGIONS_FILE = "docs/subregions.json"  # the Data layer's list of sub-regions
 DEFAULT_MODEL = "gpt-4o-mini"
 DEFAULT_TIMEOUT_S = 15.0
 DEFAULT_CACHE_PATH = "data/cache/explanations.json"
@@ -37,6 +39,8 @@ class Settings:
     results_path: Path
     use_mock: bool
     series_csv_path: Path
+    regions_dir: Path | None
+    regions_file: Path
     openai_api_key: str | None
     openai_model: str
     openai_timeout_s: float
@@ -59,6 +63,9 @@ def get_settings() -> Settings:
         results_path=Path(os.getenv("RESULTS_PATH") or default_results),
         use_mock=use_mock,
         series_csv_path=Path(os.getenv("SERIES_CSV_PATH", DEFAULT_SERIES_CSV)),
+        # Sub-regions are real data only, so mock mode has none unless REGIONS_DIR says so.
+        regions_dir=_regions_dir(use_mock),
+        regions_file=Path(os.getenv("REGIONS_FILE", DEFAULT_REGIONS_FILE)),
         openai_api_key=os.getenv("OPENAI_API_KEY") or None,
         openai_model=os.getenv("OPENAI_MODEL") or DEFAULT_MODEL,
         openai_timeout_s=_env_float("OPENAI_TIMEOUT_S", DEFAULT_TIMEOUT_S),
@@ -106,3 +113,11 @@ def _env_bool(name: str, default: bool) -> bool:
     if raw is None or not raw.strip():
         return default
     return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _regions_dir(use_mock: bool) -> Path | None:
+    """REGIONS_DIR if set; otherwise results/regions with real data and none with mock data."""
+    raw = os.getenv("REGIONS_DIR")
+    if raw:
+        return Path(raw)
+    return None if use_mock else Path(REAL_REGIONS_DIR)
