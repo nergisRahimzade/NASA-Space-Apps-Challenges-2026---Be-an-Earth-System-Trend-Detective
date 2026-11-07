@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from pathlib import Path
 
@@ -25,6 +26,7 @@ MOCK_FILE = Path(__file__).resolve().parent.parent / "results.mock.json"
 SERIES_PATH = "/series"
 REGIONS_PATH = "/regions"
 REGION_PARAM = "region"
+MAP_PATH = "/map"
 VARIABLE_PARAM = "variable"
 SEND_VARIABLE = True
 
@@ -57,8 +59,56 @@ def parse_regions(data):
             if name:
                 names.append(name)
     return names
+def parse_map(data):
+    """Turn the /map answer into [{name, lat, lon, slope, p}].
+
+    Accepts a list of points or {"points": [...]} (or "cells"). Points with a
+    missing, non-numeric or NaN lat, lon or slope are skipped, not drawn.
+    If BE changes the key names, this is the only place to edit.
+    """
+    if isinstance(data, dict):
+        data = data.get("points", data.get("cells", []))
+    if not isinstance(data, list):
+        return []
+    points = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        lat = item.get("lat", item.get("latitude"))
+        lon = item.get("lon", item.get("longitude"))
+        slope = item.get("slope")
+        if lat is None or lon is None or slope is None:
+            continue
+        try:
+            lat, lon, slope = float(lat), float(lon), float(slope)
+        except (TypeError, ValueError):
+            continue
+        if not all(math.isfinite(x) for x in (lat, lon, slope)):
+            continue
+        points.append(
+            {
+                "name": item.get("name") or f"{lat:.2f}, {lon:.2f}",
+                "lat": lat,
+                "lon": lon,
+                "slope": slope,
+                "p": item.get("p"),
+            }
+        )
+    return points
 
 
+def load_map():
+    """Map points from GET /map, or None if the endpoint isn't available.
+
+    None means "not available" (404, API down), so the page can fall back to
+    placeholders. An empty list means the API answered with no usable points.
+    """
+    try:
+        response = requests.get(f"{API_URL}{MAP_PATH}", timeout=10)
+        response.raise_for_status()
+        return parse_map(response.json())
+    except (requests.RequestException, ValueError):
+        return None
 def load_regions():
     """Region names from GET /regions, or None if the endpoint isn't available."""
     try:
@@ -71,6 +121,8 @@ def load_regions():
 
 
 def load_region_trends():
+
+    
     """Per-region slope and p-value, or None if the endpoint is unavailable.
 
     The API nests the trend numbers under a "trend" object for each region.
@@ -96,7 +148,6 @@ def load_region_trends():
         return rows
     except (requests.RequestException, ValueError, KeyError, TypeError, AttributeError):
         return None
-
 
 def load_choices(default_region, default_variable):
     """Return (region_choices, variable_choices) for the dropdowns.

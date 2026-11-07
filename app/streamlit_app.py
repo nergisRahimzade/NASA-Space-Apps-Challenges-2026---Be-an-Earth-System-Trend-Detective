@@ -16,6 +16,7 @@ from api_client import (
     API_URL,
     NoSeriesError,
     load_choices,
+    load_map,
     load_region_trends,
     load_results,
     load_series,
@@ -45,6 +46,11 @@ def get_series(region, variable, default_units):
 @st.cache_data(ttl=60)
 def get_region_trends():
     return load_region_trends()
+
+
+@st.cache_data(ttl=60)
+def get_map_points():
+    return load_map()
 
 # The only place that knows the contract's key names.
 # If results.mock.json changes, update the keys here and nowhere else.
@@ -231,17 +237,26 @@ with know_col.container(border=True):
 
 with st.container(border=True):
     st.subheader("Trend map")
-    points = mock_points()
-    if points:
-        st.plotly_chart(make_map(points, v["units"]), theme=None)
-        st.caption(
-            "Placeholder locations: the contract has no per-location trends yet, "
-            "so these points are made up for layout only."
-        )
+    map_points = get_map_points()
+    using_placeholder = map_points is None  # None = /map unavailable
+    if using_placeholder:
+        map_points = mock_points()
+    if map_points:
+        st.plotly_chart(make_map(map_points, v["units"]), theme=None)
+        if using_placeholder:
+            st.caption(
+                "Placeholder locations: the /map endpoint is not available, so "
+                "these points are made up for layout only."
+            )
+        else:
+            st.caption(
+                "Each dot is one grid cell. Red means warming, blue means "
+                "cooling. Hover a dot to see its slope."
+            )
     else:
         empty_state(
             "No locations to map yet.",
-            "Per-location trends have not been provided.",
+            "The API returned no per-location trends.",
         )
 
 with st.container(border=True):
