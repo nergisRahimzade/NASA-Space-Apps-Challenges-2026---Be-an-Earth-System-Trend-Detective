@@ -46,6 +46,18 @@ until real data replaces it (USE_MOCK=false).
 
 - `/series?region=` and `/trend?region=` take a region's `id` or label, ignoring upper/lowercase. A region with no file returns 404.
 
+## v1.2 (ESD-D15-BE) - additive, v1.1 readers keep working
+
+- Files: one per variable at `results/<variable>/results.json`; `results/index.json` lists them;
+  `results/results.json` is still written (copy of `output.primary_variable` in config.yaml).
+- New top-level: `contract_version` ("1.2"), `variable {name, long_name, units}`,
+  `meta {generated_at, config_fingerprint, source_file}`.
+- New in `trend`: `test`, `significant` (p < alpha and a direction), `slope_unit`,
+  `slope_per_year`, `n` (valid months). `trend.trend` may now also be `"insufficient data"`
+  (then `slope`, `p`, `tau` are null).
+- `series[].value` may be null for missing months (never NaN).
+- Unchanged: `region`, `period`, `series[]`, `trend{slope, p, tau, trend}`, `explanation`.
+
 ## Changelog
 - v0.1: initial draft
 - v1.1: per-region results files in `results/regions/` and the `/regions` list (ESD-D12-BE). The results file shape itself is unchanged.
