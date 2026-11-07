@@ -277,6 +277,24 @@ uv run --locked streamlit run app/streamlit_app.py
 
 Sync after pulling so your local environment receives dependency updates. If working directories are missing, rerun step 4.
 
+## Run the end-to-end test (Day 14)
+
+```sh
+uv run --locked python -m earth_system_trend.e2e            # committed CSVs, API in-process
+uv run --locked python -m earth_system_trend.e2e --live     # same, through a real uvicorn server
+uv run --locked python -m earth_system_trend.e2e --stub     # fake CSVs, no Data layer files needed
+```
+
+This runs the whole chain in a temporary folder: the pipeline builds
+`results.json` and one file per sub-region, the API serves them with
+`USE_MOCK=false`, and every endpoint's answer is checked against the contract
+models in `src/earth_system_trend/contract.py`. It also checks that the API
+serves exactly what the pipeline wrote, that each series has one entry per
+month, that each trend label agrees with its p-value, and that an unknown
+region answers 404. Your `results/` folder is not touched, and no OpenAI key
+is used unless you add `--with-ai`. Add `--keep <folder>` to look at the files
+afterwards. CI runs the `--live` version on every pull request and tag.
+
 ## Project structure
 
 ```text

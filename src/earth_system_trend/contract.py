@@ -55,6 +55,49 @@ class Results(_Strict):
     trend: Trend
     explanation: str | None = None
 
+# --- API answers (ESD-D14-BE) ---------------------------------------------------
+# The exact shape of each endpoint's JSON answer. The end-to-end test checks
+# real API answers against these, so a renamed or extra field fails loudly.
+
+
+class Health(_Strict):
+    status: Literal["ok"]
+
+
+class RegionSummary(_Strict):
+    """One entry of GET /regions: a region without its monthly series."""
+
+    id: str = Field(pattern=r"^[a-z0-9_]+$", description="Short name used in ?region=")
+    region: str = Field(min_length=1)
+    variable: str = Field(min_length=1)
+    units: str = Field(min_length=1)
+    period: Period
+    trend: Trend
+
+
+class RegionsResponse(_Strict):
+    regions: list[RegionSummary] = Field(min_length=1)
+
+
+class SeriesResponse(_Strict):
+    """GET /series?region=..."""
+
+    region: str = Field(min_length=1)
+    variable: str = Field(min_length=1)
+    units: str = Field(min_length=1)
+    period: Period
+    series: list[SeriesPoint] = Field(min_length=1)
+
+
+class TrendResponse(_Strict):
+    """GET /trend and GET /trend?region=..."""
+
+    region: str = Field(min_length=1)
+    variable: str = Field(min_length=1)
+    units: str = Field(min_length=1)
+    period: Period
+    trend: Trend
+    explanation: str | None
 
 class ContractError(ValueError):
     """A results file is missing, is not JSON, or does not match the contract."""

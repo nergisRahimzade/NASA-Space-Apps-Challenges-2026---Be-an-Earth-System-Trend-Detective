@@ -2,6 +2,7 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]  # ESD-D14-BE: a release tag gets its own green check
   pull_request:
 jobs:
   test:
@@ -13,3 +14,6 @@ jobs:
       - run: uv sync --locked
       - run: uv run --locked ruff check .
       - run: uv run --locked pytest
+      # ESD-D14-BE: pipeline -> real uvicorn server -> schema checks, on the committed data.
+      - name: End-to-end test (live API)
+        run: uv run --locked python -m earth_system_trend.e2e --live
