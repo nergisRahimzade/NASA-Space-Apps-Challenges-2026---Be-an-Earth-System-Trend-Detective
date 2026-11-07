@@ -1,0 +1,50 @@
+# Earth System Trend Detective - pipeline configuration (ESD-D15-BE)
+#
+# One command runs every variable listed below:
+#   uv run --locked python -m earth_system_trend.pipeline
+# Run a single variable:
+#   uv run --locked python -m earth_system_trend.pipeline --variable sst
+# Re-run even if outputs exist:
+#   uv run --locked python -m earth_system_trend.pipeline --force
+
+contract_version: "1.2"
+
+defaults:
+  region: 
+    name: "Phoenix study area"
+    bbox: [-125.0, 32.0, -114.0, 42.0]   # [lon_min, lat_min, lon_max, lat_max]
+  period: 
+    start: "2003-01"
+    end: "2024-12"
+  trend:
+    test: seasonal          # original | seasonal | hamed_rao
+    alpha: 0.05
+    min_points: 24          # fewer valid months -> "insufficient data"
+  series:
+    time_column: time
+    value_column: value
+
+# Optional hooks: "module:function" paths into the team's existing code.
+# Leave a hook out (or null) to skip that step; the pipeline then expects the
+# step's output file to already exist (e.g. timeseries CSV made by the data layer).
+hooks:
+  download: null            # e.g. "earth_system_trend.download:download_variable"
+  clean: null               # e.g. "earth_system_trend.clean:clean_variable"
+  series: null              # e.g. "earth_system_trend.series:build_series"
+  explain: null             # e.g. "earth_system_trend.explain:explain"
+
+output:
+  results_dir: results
+  primary_variable: lst     # also written to results/results.json for the existing API/app
+
+variables:
+  - name: lst
+    long_name: "Land surface temperature"
+    units: "degC"
+    series_path: data/processed/timeseries.csv
+
+  - name: sst
+    long_name: "Sea surface temperature"
+    units: "degC"
+    series_path: data/processed/timeseries_sst.csv
+    enabled: false          # flip to true once the backup variable is signed off (ESD-D15-DAT)
