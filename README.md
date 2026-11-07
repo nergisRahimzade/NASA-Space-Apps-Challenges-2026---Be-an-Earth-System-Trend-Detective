@@ -288,6 +288,13 @@ numbers and source hashes are in the [check record](docs/evidence/day14/validati
 The [Day 15 decision](docs/second_variable_decision.md) records a skip while
 the primary analysis awaits team review, as permitted by the sprint plan.
 
+## Data card and reproduction (Day 16)
+
+The [data card](docs/data_card.md) lists the source, DOI, use policy, resolution
+and processing steps. With the original HDF4 files and manifest available, run
+`uv run --locked python scripts/reproduce_data.py` to rebuild in a new directory
+and compare the products with their references.
+
 ## After pulling team changes
 
 From the repository root, run:
