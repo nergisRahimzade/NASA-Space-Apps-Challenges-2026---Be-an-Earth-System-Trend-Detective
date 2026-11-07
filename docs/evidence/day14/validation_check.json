@@ -1,0 +1,101 @@
+{
+  "scope": "ESD-D14-DAT literature comparison; diagnostic calculations only",
+  "region": "Phoenix study area",
+  "bounds_west_south_east_north": [
+    -112.4,
+    33.2,
+    -111.6,
+    33.8
+  ],
+  "period": {
+    "start": "2003-01",
+    "end": "2024-12"
+  },
+  "product": "MOD11C3.061",
+  "variable": "Nighttime land surface temperature",
+  "source_sha256": "e493af19136f20554bd0fa7ab01ec5fcd6e04e90b107cb2e9cb185143b6e573e",
+  "trend_map_sha256": "f62b0b8aa618405bcb9e207cdc71e6cb96eb4ff03d5614431573bb0dc57fd7ee",
+  "method": "Existing original Mann-Kendall and Sen slope; no seasonality or autocorrelation correction",
+  "conversion": "Monthly slope times 12 for per year; times 120 for per decade; use unrounded slope",
+  "anomaly_baseline": {
+    "start": "2003-01",
+    "end": "2024-12",
+    "definition": "Value minus mean of the same calendar month"
+  },
+  "series": [
+    {
+      "filename": "timeseries.csv",
+      "sha256": "32c803f6178dd68bd0ef58785a3d912eea11c79dd1ad0e3e8d450d31b205f38a",
+      "months": 264,
+      "slope_degC_per_month": 0.007761711445330333,
+      "slope_degC_per_year": 0.09314053734396399,
+      "slope_degC_per_decade": 0.9314053734396399,
+      "p": 0.1962482396462244,
+      "tau": 0.053404770134808155,
+      "direction": "no trend",
+      "backend_fields": {
+        "slope": 0.0078,
+        "p": 0.1962,
+        "tau": 0.053,
+        "trend": "no trend"
+      }
+    },
+    {
+      "filename": "anomaly.csv",
+      "sha256": "a11f6e750097b73d4496b1145f85f6e5d573fecee1faf57d974e64f404eb4855",
+      "months": 264,
+      "slope_degC_per_month": 0.007030308232647123,
+      "slope_degC_per_year": 0.08436369879176547,
+      "slope_degC_per_decade": 0.8436369879176547,
+      "p": 5.775047107192677e-11,
+      "tau": 0.270538080424012,
+      "direction": "increasing",
+      "backend_fields": {
+        "slope": 0.007,
+        "p": 0.0,
+        "tau": 0.271,
+        "trend": "increasing"
+      }
+    }
+  ],
+  "references": [
+    {
+      "id": "waring_2023",
+      "doi": "10.1080/01431161.2023.2240522",
+      "url": "https://www.tandfonline.com/doi/full/10.1080/01431161.2023.2240522",
+      "locator": "Sections 3.2 and 4.2.2; Figure 8; Table 1",
+      "region": "Western U.S.A. study region",
+      "period": "2002-2021",
+      "product": "Aqua MODIS MYDCCI, ESA LST_cci",
+      "measurement": "Nighttime LST anomalies",
+      "reported_rate": 0.52,
+      "reported_units": "K per decade",
+      "rate_degC_per_decade": 0.52,
+      "published_significance": "p < 0.05; autocorrelation-adjusted where required",
+      "comparability": "Regional nighttime context; not an identical Phoenix product, boundary, period or method",
+      "abstract_reported_rate_K_per_decade": 0.54,
+      "abstract_url": "https://modis.gsfc.nasa.gov/sci_team/pubs/abstract_new.php?id=62131",
+      "source_discrepancy": "Results text reports 0.52 K/decade; abstract reports 0.54. Use results text for this contextual comparison."
+    },
+    {
+      "id": "zhu_2023",
+      "doi": "10.1029/2022AV000816",
+      "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2022AV000816",
+      "locator": "Table 1; Section 2.2.2; Section 3.1 and Figure 2e",
+      "region": "Phoenix study area used in that paper",
+      "period": "2000-2020",
+      "product": "Landsat 30 m summer LST",
+      "measurement": "Annual summer means; mean of per-pixel Sen slopes",
+      "reported_rate": 0.11,
+      "reported_units": "degC per year",
+      "rate_degC_per_decade": 1.1,
+      "comparability": "Phoenix summer surface-warming context; not a nighttime MODIS trend",
+      "nighttime_layer_distinction": "Paper nighttime ECOSTRESS scenes are from summer 2019, not the Landsat trend record"
+    }
+  ],
+  "conclusion": "Contextual agreement in positive slope direction only; quantitative reproduction and scientific sign-off not established",
+  "quality_policy": "Numeric fill and valid range only; production QC filter not applied",
+  "runtime": {
+    "pymannkendall": "1.4.3"
+  }
+}

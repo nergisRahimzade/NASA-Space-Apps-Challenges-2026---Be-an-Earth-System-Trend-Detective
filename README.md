@@ -276,6 +276,13 @@ This tests a 4×4 sample, then the 192-cell Phoenix window using
 it saves `data/processed/trend_map.nc` and a [preview](docs/evidence/day13/trend_map.png).
 See [map notes](docs/trend_map_notes.md) for fields, timings and preliminary status.
 
+## Compare with published trends (Day 14)
+
+[Validation](docs/validation.md) compares the provisional Phoenix results with
+two published LST studies, explains differences in measurement and methods,
+and records the original-versus-anomaly significance check. Full-precision
+numbers and source hashes are in the [check record](docs/evidence/day14/validation_check.json).
+
 ## After pulling team changes
 
 From the repository root, run:
